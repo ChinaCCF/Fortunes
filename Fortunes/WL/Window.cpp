@@ -51,6 +51,7 @@ namespace WL
 	{
 		return TRUE;
 	}
+
 	st Window::event_for_touch(TouchEvent* e)
 	{
 		if(e->get_type() != WL::TouchEvent::Move)

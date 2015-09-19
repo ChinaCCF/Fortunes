@@ -225,6 +225,13 @@ namespace WL
 		return FALSE;
 	}
 
+	static void update_frame(_Window32* win)
+	{
+		RECT r;
+		GetWindowRect(win->hwnd_, &r);
+		win->frame_.x = r.left;
+		win->frame_.y = r.top;
+	}
 	static LRESULT CALLBACK Window_Process(HWND hWnd, UINT message, WPARAM w, LPARAM l)
 	{
 		if(message == WM_NCCREATE)
@@ -243,6 +250,14 @@ namespace WL
 					else
 					{
 						if(message == WM_MOUSEMOVE) { if(touch_event(win, WL::TouchEvent::Move, l)) return 0; }
+						else
+						{
+							if(message == WM_EXITSIZEMOVE) { update_frame(win); return 0; }
+							else
+							{
+
+							}
+						}
 					}
 				}
 			}
