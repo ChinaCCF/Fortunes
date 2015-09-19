@@ -20,14 +20,14 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -41,13 +41,14 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -60,7 +61,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -74,17 +75,39 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Resource.h" />
+    <ClInclude Include="CL\CL.h" />
+    <ClInclude Include="CL\Memory.h" />
+    <ClInclude Include="CL\Object\Array.h" />
+    <ClInclude Include="CL\Object\String.h" />
+    <ClInclude Include="Resource\Resource.h" />
+    <ClInclude Include="UI\Login.h" />
+    <ClInclude Include="WL\Event.h" />
+    <ClInclude Include="WL\Graphics\Geometry.h" />
+    <ClInclude Include="WL\Graphics\Graphics.h" />
+    <ClInclude Include="WL\Graphics\Render.h" />
+    <ClInclude Include="WL\Window.h" />
+    <ClInclude Include="WL\Window32.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CL\CL.cpp" />
+    <ClCompile Include="CL\Memory.cpp" />
+    <ClCompile Include="CL\Object\String.cpp" />
     <ClCompile Include="Fortunes.cpp" />
+    <ClCompile Include="UI\Login.cpp" />
+    <ClCompile Include="WL\Event.cpp" />
+    <ClCompile Include="WL\Graphics\Render.cpp" />
+    <ClCompile Include="WL\Window.cpp" />
+    <ClCompile Include="WL\Window32.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Fortunes.rc" />
+    <ResourceCompile Include="Resource\Fortunes.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Fortunes.ico" />
-    <Image Include="small.ico" />
+    <Image Include="Resource\Fortunes.ico" />
+    <Image Include="Resource\login_side.png" />
+    <Image Include="Resource\pwd.png" />
+    <Image Include="Resource\small.ico" />
+    <Image Include="Resource\user.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

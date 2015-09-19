@@ -15,7 +15,40 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Resource.h">
+    <ClInclude Include="CL\Object\Array.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CL\Object\String.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CL\CL.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CL\Memory.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource\Resource.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="WL\Window32.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="WL\Graphics\Geometry.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="WL\Graphics\Graphics.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\Login.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="WL\Window.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="WL\Event.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="WL\Graphics\Render.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -23,17 +56,50 @@
     <ClCompile Include="Fortunes.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="CL\Object\String.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="CL\CL.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="CL\Memory.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="WL\Window32.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\Login.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="WL\Window.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="WL\Event.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="WL\Graphics\Render.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Fortunes.rc">
+    <ResourceCompile Include="Resource\Fortunes.rc">
       <Filter>资源文件</Filter>
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="small.ico">
+    <Image Include="Resource\small.ico">
       <Filter>资源文件</Filter>
     </Image>
-    <Image Include="Fortunes.ico">
+    <Image Include="Resource\Fortunes.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="Resource\login_side.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="Resource\pwd.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="Resource\user.png">
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>
