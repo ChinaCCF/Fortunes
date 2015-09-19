@@ -1,30 +1,14 @@
 #include <CL/CL.h>
 #include <WL/Graphics/Geometry.h>
+#include <WL/Graphics/Render.h>
+
 #pragma once
 
 namespace WL
 {
-	class _Event;
-	class Event
-	{
-		_Event* self;
-	public:
-		enum EventType
-		{
-			Touch,
-			Keyboard
-		};
-
-		Event();
-		~Event();
-		st init(s64 time, EventType type);
-
-		s64 time();
-		EventType type();
-	};
-
+	 
 	class _KeyBoardEvent;
-	class KeyBoardEvent : public Event
+	class KeyBoardEvent
 	{
 		_KeyBoardEvent* self;
 	public:
@@ -70,13 +54,15 @@ namespace WL
 		KeyBoardEvent();
 		~KeyBoardEvent();
 		st init(KeyType type, st val);
-		KeyType get_key_type();
+
+		s64 get_time();
+		KeyType get_type();
 		char get_char();
 		KeyValue get_key();
 	};
 
 	class _TouchEvent;
-	class TouchEvent : public Event
+	class TouchEvent
 	{
 		_TouchEvent* self;
 	public:
@@ -89,8 +75,11 @@ namespace WL
 		TouchEvent();
 		~TouchEvent();
 		st init(TouchType type, st count, Point* points);
-		st count();
-		Point* points();
+
+		s64 get_time();
+		TouchType get_type();
+		st get_count();
+		Point* get_points();
 	};
 
 	class IResponse
@@ -98,6 +87,6 @@ namespace WL
 	public:
 		virtual st event_for_keyboard(KeyBoardEvent* e) { return FALSE; }
 		virtual st event_for_touch(TouchEvent* e) { return FALSE; }
-		virtual void redraw() {}
+		virtual void redraw(IRender* render, Rect* r) {}
 	};
 }

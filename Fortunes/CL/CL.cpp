@@ -17,7 +17,7 @@ namespace CL
 		else
 			file_name += 1;
 		::printf("File: %s   ", file_name);
-		::printf("Line: %d   ", line);
+		::printf("Line: %d   Message:   ", line);
 		::printf("%s\n", message);
 #else
 		OutputDebugStringA("File: ");
@@ -30,8 +30,8 @@ namespace CL
 		OutputDebugStringA(file_name);
 		OutputDebugStringA("   ");
 		OutputDebugStringA("Line: ");
-		char buf[16];
-		_snprintf_s(buf, 16, "%d    ", line);
+		char buf[32];
+		_snprintf_s(buf, 16, "%d   Message:  ", line);
 		OutputDebugStringA(buf);
 		OutputDebugStringA(message);
 #endif

@@ -85,7 +85,7 @@ namespace WL
 	};
 	/*****************************************************************/
 	/*****************************************************************/
-	IRender* IRender::render_of_gdi(HDC hdc)
+	IRender* IRender::create_gdi_render(HDC hdc)
 	{
 		GDI* gdi = cl_new(GDI);
 		if(gdi)

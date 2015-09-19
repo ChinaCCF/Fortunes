@@ -27,6 +27,6 @@ namespace WL
 		virtual void offset_y(st y) {}
 		virtual void offset(st x, st y) {}
 
-		static IRender* render_of_gdi(HDC hdc);
+		static IRender* create_gdi_render(HDC hdc);
 	};
 }

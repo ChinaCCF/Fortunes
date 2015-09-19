@@ -45,10 +45,10 @@
     <ClInclude Include="WL\Window.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="WL\Event.h">
+    <ClInclude Include="WL\Graphics\Render.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="WL\Graphics\Render.h">
+    <ClInclude Include="WL\Event.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -65,9 +65,6 @@
     <ClCompile Include="CL\Memory.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="WL\Window32.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="UI\Login.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -78,6 +75,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="WL\Graphics\Render.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="WL\Window32.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

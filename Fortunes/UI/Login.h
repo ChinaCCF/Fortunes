@@ -1,13 +1,11 @@
-#include <WL/Window32.h>
+#include <WL/Window.h>
 #pragma once
 
 namespace Fortunes
 {
-	class Login
-	{
-		WL::Window32* window_;
+	class Login : public WL::Window
+	{ 
 	public:
-		Login();
-		//void close();
+		Login(); 
 	};
 }

@@ -10,6 +10,7 @@ namespace CL
 	{
 	public:
 		static void string_copy(char* buf, st buf_size, const char* str);
+		static void format(char* buf, st buf_size, const char* format_str, ...);
 	};
 
  

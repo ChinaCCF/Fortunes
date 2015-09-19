@@ -28,15 +28,6 @@ namespace WL
 			alpha_ = 1.0;
 			response_ = NULL;
 		}
-		~_Window32()
-		{
-			cl_free(text_);
-		}
-		st init()
-		{
-			text_ = cl_alloc_type_with_count(char, text_size_);
-			return text_ ? TRUE : FALSE;
-		}
 	};
 
 	/************************************************************************************************/
@@ -84,8 +75,12 @@ namespace WL
 	Window32::Window32() { self = NULL; }
 	Window32::~Window32()
 	{
-		if(self && self->hwnd_)
-			DestroyWindow(self->hwnd_);
+		if(self)
+		{
+			cl_free(self->text_);
+			if(self->hwnd_)
+				DestroyWindow(self->hwnd_);
+		}
 		cl_delete(self);
 	}
 
@@ -93,14 +88,15 @@ namespace WL
 	{
 		self = cl_new(_Window32);
 		if(self == NULL) return FALSE;
-		if(!self->init()) return FALSE;
+		self->text_ = cl_alloc_type_with_count(char, self->text_size_);
+		if(self->text_ == NULL) return FALSE;
 
 		const char* class_name = "WLWindow";
 		if(!register_window_class(class_name, Window_Process)) return FALSE;
 		self->hwnd_ = create_window(class_name);
 		if(self->hwnd_ != NULL)
 		{
-			SetWindowLongA(self->hwnd_, 0, (LONG)this);
+			SetWindowLongA(self->hwnd_, 0, (LONG)self);
 			return TRUE;
 		}
 		return FALSE;
@@ -190,51 +186,68 @@ namespace WL
 	void Window32::loop() { MSG msg; while(GetMessage(&msg, NULL, 0, 0)) { TranslateMessage(&msg); DispatchMessage(&msg); } }
 	void Window32::exit() { PostQuitMessage(0); }
 
+	/*********************************************************************************/
+	/*********************************************************************************/
+	static st paint(_Window32* win, WPARAM w, LPARAM l)
+	{
+		if(win->response_)
+		{
+			PAINTSTRUCT ps;
+			HDC hdc = BeginPaint(win->hwnd_, &ps);
 
-	static LRESULT CALLBACK Window_Process(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+			st w = ps.rcPaint.right - ps.rcPaint.left;
+			st h = ps.rcPaint.bottom - ps.rcPaint.top;
+			WL::Rect r;
+			r.set(ps.rcPaint.left, ps.rcPaint.top, w, h);
+
+			WL::IRender* gdi = WL::IRender::create_gdi_render(hdc);
+			if(gdi == NULL) return FALSE;
+			win->response_->redraw(gdi, &r);
+			cl_delete(gdi);
+
+			EndPaint(win->hwnd_, &ps);
+			return TRUE;
+		}
+		return FALSE;
+	}
+
+	static st touch_event(_Window32* win, WL::TouchEvent::TouchType type, LPARAM l)
+	{
+		if(win->response_)
+		{
+			Point p;
+			p.set(LOWORD(l), HIWORD(l));
+			WL::TouchEvent e;
+			if(!e.init(type, 1, &p)) return FALSE;
+			win->response_->event_for_touch(&e);
+			return TRUE;
+		}
+		return FALSE;
+	}
+
+	static LRESULT CALLBACK Window_Process(HWND hWnd, UINT message, WPARAM w, LPARAM l)
 	{
 		if(message == WM_NCCREATE)
 			SetWindowLong(hWnd, 0, 0);
 
-		Window32* win = (Window32*)GetWindowLong(hWnd, 0);
+		_Window32* win = (_Window32*)GetWindowLong(hWnd, 0);
 		if(win)
 		{
-			if(message == WM_PAINT)
-			{
-				PAINTSTRUCT ps;
-				HDC hdc = BeginPaint(hWnd, &ps);
-				st w = ps.rcPaint.right - ps.rcPaint.left;
-				st h = ps.rcPaint.bottom - ps.rcPaint.top;
-				WL::Rect r;
-				r.set(ps.rcPaint.left, ps.rcPaint.top, w, h);
-
-				/*WL::IRender* gdi = WL::IRender::gdi(hdc, r);
-				win->window_->redraw(gdi, r);
-				gdi->release();*/
-
-				EndPaint(hWnd, &ps);
-				return 0;
-			}
+			if(message == WM_PAINT) { if(paint(win, w, l)) return 0; }
 			else
 			{
-				if(message == WM_LBUTTONDOWN)
-				{
-
-				}
+				if(message == WM_LBUTTONDOWN) { if(touch_event(win, WL::TouchEvent::Down, l)) return 0; }
 				else
 				{
-					if(message == WM_LBUTTONUP)
-					{
-
-					}
+					if(message == WM_LBUTTONUP) { if(touch_event(win, WL::TouchEvent::Up, l)) return 0; }
 					else
 					{
-
+						if(message == WM_MOUSEMOVE) { if(touch_event(win, WL::TouchEvent::Move, l)) return 0; }
 					}
 				}
 			}
 		}
 
-		return DefWindowProc(hWnd, message, wParam, lParam);
+		return DefWindowProc(hWnd, message, w, l);
 	}
 }
