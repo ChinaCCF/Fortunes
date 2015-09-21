@@ -6,82 +6,146 @@
 
 namespace WL
 {
-	static inline Gdiplus::Rect convert(const Rect* r)
-	{
-		return Gdiplus::Rect(r->x, r->y, r->w, r->h);
-	}
 	/***********************************************************************************/
 	/***********************************************************************************/
 	class GDI : public IRender
 	{
-		ULONG_PTR gdiplus_token_;
-		HDC hdc_;
-		Gdiplus::Graphics* graphics_;
-		Gdiplus::Color* color_;
-		ft width_;
+		ULONG_PTR gdiplus_token;
+		HDC hdc;
+		Gdiplus::Graphics* graphics;
+		Gdiplus::Color* color;
+		ft width;
+		Gdiplus::Font* font;
 	public:
 		GDI()
 		{
-			gdiplus_token_ = NULL;
-			graphics_ = NULL;
-			color_ = NULL;
-			width_ = 1.0;
+			gdiplus_token = NULL;
+			graphics = NULL;
+			color = NULL;
+			width = 1.0;
 		}
 		~GDI()
 		{
-			if(color_) cl_delete(color_);
-			if(graphics_)
+			if(color) cl_delete(color);
+			if(font) delete font;
+			if(graphics)
 			{
-				graphics_->ReleaseHDC(hdc_);
-				cl_delete(graphics_);
+				graphics->ReleaseHDC(hdc);
+				cl_delete(graphics);
 			}
-			if(gdiplus_token_) 	Gdiplus::GdiplusShutdown(gdiplus_token_);
+			if(gdiplus_token) 	Gdiplus::GdiplusShutdown(gdiplus_token);
 		}
 		st init(HDC hdc)
 		{
 			Gdiplus::GdiplusStartupInput gdiplus_input;
-			if(Gdiplus::GdiplusStartup(&gdiplus_token_, &gdiplus_input, NULL) != Gdiplus::Status::Ok) return FALSE;
+			if(Gdiplus::GdiplusStartup(&gdiplus_token, &gdiplus_input, NULL) != Gdiplus::Status::Ok) return FALSE;
 
-			hdc_ = hdc;
+			hdc = hdc;
 
-			graphics_ = new Gdiplus::Graphics(hdc_);
-			if(graphics_ == NULL) return FALSE;
-			graphics_->SetSmoothingMode(Gdiplus::SmoothingModeHighQuality);
+			graphics = new Gdiplus::Graphics(hdc);
+			if(graphics == NULL) return FALSE;
+			graphics->SetSmoothingMode(Gdiplus::SmoothingModeHighQuality);
 
-			color_ = cl_new(Gdiplus::Color);
-			if(color_ == NULL)return FALSE;
+			color = cl_new(Gdiplus::Color);
+			if(color == NULL)return FALSE;
+			font = new Gdiplus::Font(L"ÐÂËÎÌå", 15, Gdiplus::FontStyle::FontStyleRegular);
+			if(font == NULL) return FALSE;
 			return TRUE;
 		}
 	public:
-		void set_color(ft a, st r, st g, st b) { color_->SetValue(Gdiplus::Color::MakeARGB((BYTE)(a * 255), (BYTE)r, (BYTE)g, (BYTE)b)); }
-		void set_color(Color* c) { color_->SetValue(Gdiplus::Color::MakeARGB((BYTE)(c->alpha * 255), (BYTE)c->red, (BYTE)c->green, (BYTE)c->blue)); }
+		void set_color(st r, st g, st b) { color->SetValue(Gdiplus::Color::MakeARGB((BYTE)(255), (BYTE)r, (BYTE)g, (BYTE)b)); }
+		void set_color(ft a, st r, st g, st b) { color->SetValue(Gdiplus::Color::MakeARGB((BYTE)(a * 255), (BYTE)r, (BYTE)g, (BYTE)b)); }
+		void set_color(const Color* c) { color->SetValue(Gdiplus::Color::MakeARGB((BYTE)(c->alpha * 255), (BYTE)c->red, (BYTE)c->green, (BYTE)c->blue)); }
 
-		void set_pen_width(st width) { width_ = width; }
+		void set_pen_width(st width) { width = width; }
 
-		void fill_rect(Rect* r)
+		virtual void fill_rect(st x, st y, st w, st h)
 		{
-			Gdiplus::SolidBrush* brush = new Gdiplus::SolidBrush(*color_);
-			graphics_->FillRectangle(brush, convert(r));
+			Gdiplus::SolidBrush* brush = new Gdiplus::SolidBrush(*color);
+			graphics->FillRectangle(brush, Gdiplus::Rect(x, y, w, h));
 			delete brush;
 		}
-		void draw_rect(Rect* r)
+		void fill_rect(const Rect* r) { fill_rect(r->x, r->y, r->w, r->h); }
+		void draw_rect(const Rect* r)
 		{
-			Gdiplus::Pen* pen = new Gdiplus::Pen(*color_, (Gdiplus::REAL)width_);
-			graphics_->DrawRectangle(pen, r->x, r->y, r->w, r->h);
+			Gdiplus::Pen* pen = new Gdiplus::Pen(*color, (Gdiplus::REAL)width);
+			graphics->DrawRectangle(pen, r->x, r->y, r->w, r->h);
 			delete pen;
 		}
 
-		void fill_rect_with_corner(Rect* r, st corner) {}
-		void draw_rect_with_corner(Rect* r, st corner) {}
+		void fill_rect_with_corner(const Rect* r, st corner) {}
+		void draw_rect_with_corner(const Rect* r, st corner) {}
 
-		void fill_ellipse(Rect* r) {}
-		void draw_ellipse(Rect* r) {}
+		void fill_ellipse(const Rect* r) {}
+		void draw_ellipse(const Rect* r) {}
 
-		void set_clip(Rect* r) {}
+		void set_clip(const Rect* r) {}
 		void offset_x(st x) {}
 		void offset_y(st y) {}
 		void offset(st x, st y) {}
 
+		void set_font(const Font* f)
+		{
+			Gdiplus::FontStyle style;
+			if(f->is_bold)
+				style = Gdiplus::FontStyle::FontStyleBold;
+			else
+				style = Gdiplus::FontStyle::FontStyleRegular;
+
+			wchar font_name[32];
+			CL::StringUtil::char_to_wchar(f->name, font_name, 32);
+			Gdiplus::Font* tmp = new Gdiplus::Font(font_name, (Gdiplus::REAL)f->size, style);
+			if(tmp) { delete font; font = tmp; }
+		}
+		st text_height(const char* str)
+		{
+			Size size;
+			text_size(str, &size);
+			return size.h;
+		}
+		st text_width(const char* str)
+		{
+			Size size;
+			text_size(str, &size);
+			return size.w;
+		}
+		void text_size(const char* str, Size* size)
+		{
+			size->w = 0;
+			size->h = 0;
+
+			st count = CL::StringUtil::char_to_wchar_count(str);
+			wchar* wstr = cl_alloc_type_with_count(wchar, count);
+			if(wstr == NULL) return;
+			CL::StringUtil::char_to_wchar(str, wstr, count);
+
+			Gdiplus::RectF limit(0, 0, 9999, 9999);
+			Gdiplus::RectF result;
+			graphics->MeasureString(wstr, -1, font, limit, &result);
+			cl_free(wstr);
+			size->set((st)result.Width, (st)result.Height);
+		}
+		void draw_text(const Rect* r, const char* str)
+		{
+			Gdiplus::SolidBrush* brush = new Gdiplus::SolidBrush(*color);
+			if(brush == NULL) return;
+
+			st count = CL::StringUtil::char_to_wchar_count(str);
+			wchar* wstr = cl_alloc_type_with_count(wchar, count);
+			if(wstr == NULL) { delete brush;  return; }
+			CL::StringUtil::char_to_wchar(str, wstr, count);
+
+			Gdiplus::Region old_val;
+			graphics->GetClip(&old_val);
+
+			Gdiplus::Region new_val(Gdiplus::Rect(r->x, r->y, r->w, r->h));
+			graphics->SetClip(&new_val);
+
+			graphics->DrawString(wstr, -1, font, Gdiplus::PointF((Gdiplus::REAL)r->x, (Gdiplus::REAL)r->y), brush);
+			graphics->SetClip(&old_val);
+			cl_free(wstr);
+			delete brush;
+		}
 	};
 	/*****************************************************************/
 	/*****************************************************************/

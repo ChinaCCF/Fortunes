@@ -85,8 +85,10 @@
     <ClInclude Include="WL\Graphics\Geometry.h" />
     <ClInclude Include="WL\Graphics\Graphics.h" />
     <ClInclude Include="WL\Graphics\Render.h" />
+    <ClInclude Include="WL\View.h" />
     <ClInclude Include="WL\Window.h" />
     <ClInclude Include="WL\Window32.h" />
+    <ClInclude Include="WL\WindowControls\Button.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CL\CL.cpp" />
@@ -98,6 +100,7 @@
     <ClCompile Include="WL\Graphics\Render.cpp" />
     <ClCompile Include="WL\Window.cpp" />
     <ClCompile Include="WL\Window32.cpp" />
+    <ClCompile Include="WL\WindowControls\Button.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource\Fortunes.rc" />

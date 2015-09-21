@@ -51,6 +51,12 @@
     <ClInclude Include="WL\Event.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="WL\View.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="WL\WindowControls\Button.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Fortunes.cpp">
@@ -78,6 +84,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="WL\Window32.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="WL\WindowControls\Button.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

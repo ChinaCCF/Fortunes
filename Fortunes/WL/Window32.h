@@ -1,6 +1,5 @@
 #include <Windows.h> 
 #include <WL/Graphics/Geometry.h>
-#include <WL/Event.h>
 #pragma once
 
 namespace WL
@@ -22,7 +21,7 @@ namespace WL
 		const char* get_title();
 		void set_parent(HWND parent);
 		HWND get_parent();
-		void set_frame(Rect* r);
+		void set_frame(const Rect* r);
 		void set_frame(st x, st y, st w, st h);
 		void get_frame(Rect* r);
 		void set_is_layer(st val);
@@ -30,11 +29,12 @@ namespace WL
 		void set_alpha(ft val);
 		ft get_alpha();
 
-		void set_response(IResponse* response);
-
+		void update();
 		void show();
 		void hide();
 		void close();
+
+		void set_dispatcher(void* dispatcher);
 	public:
 		static void set_application(HINSTANCE ins);
 		static void loop();

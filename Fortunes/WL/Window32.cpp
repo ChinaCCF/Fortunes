@@ -2,31 +2,35 @@
 #include <math.h>
 #include <CL/Memory.h>
 #include <CL/Object/String.h> 
+#include <WL/Window.h>
 
 namespace WL
 {
 	class _Window32
 	{
 	public:
-		HWND hwnd_;
-		char* text_;
-		Rect frame_;
-		st text_size_;
-		st is_layer_;
-		ft alpha_;
-		st has_show_;
-		IResponse* response_;
-
+		HWND hwnd;
+		char* text;
+		Rect frame;
+		st text_size;
+		st is_layer;
+		st is_child;
+		ft alpha;
+		st has_show;
+		BaseWindow* dispatcher;
+		st is_mouse_track;
 		_Window32()
 		{
-			hwnd_ = NULL;
-			text_size_ = 64;
-			text_ = NULL;
-			frame_.set(0, 0, 100, 100);
-			is_layer_ = FALSE;
-			has_show_ = FALSE;
-			alpha_ = 1.0;
-			response_ = NULL;
+			hwnd = NULL;
+			text_size = 64;
+			text = NULL;
+			frame.set(0, 0, 100, 100);
+			is_layer = FALSE;
+			is_child = FALSE;
+			has_show = FALSE;
+			alpha = 1.0;
+			dispatcher = NULL;
+			is_mouse_track = FALSE;
 		}
 	};
 
@@ -77,9 +81,9 @@ namespace WL
 	{
 		if(self)
 		{
-			cl_free(self->text_);
-			if(self->hwnd_)
-				DestroyWindow(self->hwnd_);
+			cl_free(self->text);
+			if(self->hwnd)
+				DestroyWindow(self->hwnd);
 		}
 		cl_delete(self);
 	}
@@ -88,99 +92,109 @@ namespace WL
 	{
 		self = cl_new(_Window32);
 		if(self == NULL) return FALSE;
-		self->text_ = cl_alloc_type_with_count(char, self->text_size_);
-		if(self->text_ == NULL) return FALSE;
+		self->text = cl_alloc_type_with_count(char, self->text_size);
+		if(self->text == NULL) return FALSE;
 
 		const char* class_name = "WLWindow";
 		if(!register_window_class(class_name, Window_Process)) return FALSE;
-		self->hwnd_ = create_window(class_name);
-		if(self->hwnd_ != NULL)
+		self->hwnd = create_window(class_name);
+		if(self->hwnd != NULL)
 		{
-			SetWindowLongA(self->hwnd_, 0, (LONG)self);
+			SetWindowLongA(self->hwnd, 0, (LONG)self);
 			return TRUE;
 		}
 		return FALSE;
 	}
 
-	HWND Window32::get_handle() { return self->hwnd_; }
-	void Window32::set_ico(st ico) { SendMessageA(self->hwnd_, WM_SETICON, ICON_SMALL, (LPARAM)LoadIconA(g_application_instance, MAKEINTRESOURCEA(ico))); }
+	HWND Window32::get_handle() { return self->hwnd; }
+	void Window32::set_ico(st ico) { SendMessageA(self->hwnd, WM_SETICON, ICON_SMALL, (LPARAM)LoadIconA(g_application_instance, MAKEINTRESOURCEA(ico))); }
 	void Window32::set_title(const char* title)
 	{
-		CL::StringUtil::string_copy(self->text_, self->text_size_, title);
-		SetWindowTextA(self->hwnd_, self->text_);
+		CL::StringUtil::string_copy(self->text, self->text_size, title);
+		SetWindowTextA(self->hwnd, self->text);
 	}
-	const char* Window32::get_title() { return self->text_; }
-	void Window32::set_parent(HWND parent) { SetParent(self->hwnd_, parent); }
-	HWND Window32::get_parent() { return GetParent(self->hwnd_); }
-	void Window32::set_frame(Rect* r) { set_frame(r->x, r->y, r->w, r->h); }
+	const char* Window32::get_title() { return self->text; }
+	void Window32::set_parent(HWND parent)
+	{
+		if(parent)
+			self->is_child = TRUE;
+		else
+			self->is_child = FALSE;
+		SetParent(self->hwnd, parent);
+	}
+	HWND Window32::get_parent() { return GetParent(self->hwnd); }
+	void Window32::set_frame(const Rect* r) { set_frame(r->x, r->y, r->w, r->h); }
 	void Window32::set_frame(st x, st y, st w, st h)
 	{
 		st need_redraw = FALSE;
-		if(w != self->frame_.w || h != self->frame_.h)
+		if(w != self->frame.w || h != self->frame.h)
 			need_redraw = TRUE;
-		self->frame_.set(x, y, w, h);
-		MoveWindow(self->hwnd_, x, y, w, h, need_redraw);
+		self->frame.set(x, y, w, h);
+		MoveWindow(self->hwnd, x, y, w, h, need_redraw);
 	}
-	void Window32::get_frame(Rect* r) { *r = self->frame_; }
+	void Window32::get_frame(Rect* r) { *r = self->frame; }
 	void Window32::set_is_layer(st val)
 	{
-		if(val != self->is_layer_)
+		if(val != self->is_layer)
 		{
-			st style = GetWindowLongA(self->hwnd_, GWL_EXSTYLE);
+			st style = GetWindowLongA(self->hwnd, GWL_EXSTYLE);
 			if(val)
 				style |= WS_EX_LAYERED;
 			else
 				style ^= WS_EX_LAYERED;
-			SetWindowLongA(self->hwnd_, GWL_EXSTYLE, style);
-			self->is_layer_ = val;
+			SetWindowLongA(self->hwnd, GWL_EXSTYLE, style);
+			self->is_layer = val;
 		}
 	}
-	st Window32::get_is_layer() { return self->is_layer_; }
+	st Window32::get_is_layer() { return self->is_layer; }
 	void Window32::set_alpha(ft val)
 	{
-		if(self->is_layer_)
+		if(self->is_layer)
 		{
-			if(abs(self->alpha_ - val) > 0.01)
+			if(abs(self->alpha - val) > 0.01)
 			{
-				self->alpha_ = val;
-				self->alpha_ = CL::MAX(0.0, CL::MIN(1.0, self->alpha_));
-				SetLayeredWindowAttributes(self->hwnd_, NULL, (BYTE)(self->alpha_ * 254), LWA_ALPHA);
+				self->alpha = val;
+				self->alpha = CL::MAX(0.0, CL::MIN(1.0, self->alpha));
+				SetLayeredWindowAttributes(self->hwnd, NULL, (BYTE)(self->alpha * 254), LWA_ALPHA);
 			}
 		}
 	}
-	ft Window32::get_alpha() { return self->alpha_; }
+	ft Window32::get_alpha() { return self->alpha; }
 
 
-	void Window32::set_response(IResponse* response) { self->response_ = response; }
-
-
+	void Window32::update()
+	{
+		if(self->is_child)
+			InvalidateRect(self->hwnd, NULL, FALSE);
+		else
+			UpdateWindow(self->hwnd);
+	}
 	void Window32::show()
 	{
-		if(!self->has_show_)
+		if(!self->has_show)
 		{
-			if(get_parent() == NULL)
+			if(!self->is_child)
 			{
 				int w = GetSystemMetrics(SM_CXSCREEN);
 				int h = GetSystemMetrics(SM_CYSCREEN);
 				Rect screen;
 				screen.set(0, 0, w, h);
 
-				self->frame_.move_to_center_in(&screen);
-				MoveWindow(self->hwnd_, self->frame_.x, self->frame_.y, self->frame_.w, self->frame_.h, FALSE);
-				UpdateWindow(self->hwnd_);
+				self->frame.move_to_center_in(&screen);
+				MoveWindow(self->hwnd, self->frame.x, self->frame.y, self->frame.w, self->frame.h, FALSE);
 			}
 			else
-			{
-				MoveWindow(self->hwnd_, self->frame_.x, self->frame_.y, self->frame_.w, self->frame_.h, TRUE);
-				InvalidateRect(self->hwnd_, NULL, FALSE);
-			}
-			self->has_show_ = TRUE;
+				MoveWindow(self->hwnd, self->frame.x, self->frame.y, self->frame.w, self->frame.h, TRUE);
+			self->has_show = TRUE;
+			update();
 		}
-		ShowWindow(self->hwnd_, SW_SHOW);
+		ShowWindow(self->hwnd, SW_SHOW);
 	}
-	void Window32::hide() { ShowWindow(self->hwnd_, SW_HIDE); }
+	void Window32::hide() { ShowWindow(self->hwnd, SW_HIDE); }
 	void Window32::close() { cl_delete(this); }
 
+
+	void Window32::set_dispatcher(void* dispatcher) { self->dispatcher = (BaseWindow*)dispatcher; }
 	/*********************************************************************************/
 	void Window32::set_application(HINSTANCE ins) { g_application_instance = ins; }
 	void Window32::loop() { MSG msg; while(GetMessage(&msg, NULL, 0, 0)) { TranslateMessage(&msg); DispatchMessage(&msg); } }
@@ -190,10 +204,10 @@ namespace WL
 	/*********************************************************************************/
 	static st paint(_Window32* win, WPARAM w, LPARAM l)
 	{
-		if(win->response_)
+		if(win->dispatcher)
 		{
 			PAINTSTRUCT ps;
-			HDC hdc = BeginPaint(win->hwnd_, &ps);
+			HDC hdc = BeginPaint(win->hwnd, &ps);
 
 			st w = ps.rcPaint.right - ps.rcPaint.left;
 			st h = ps.rcPaint.bottom - ps.rcPaint.top;
@@ -202,10 +216,10 @@ namespace WL
 
 			WL::IRender* gdi = WL::IRender::create_gdi_render(hdc);
 			if(gdi == NULL) return FALSE;
-			win->response_->redraw(gdi, &r);
+			win->dispatcher->redraw(gdi, &r);
 			cl_delete(gdi);
 
-			EndPaint(win->hwnd_, &ps);
+			EndPaint(win->hwnd, &ps);
 			return TRUE;
 		}
 		return FALSE;
@@ -213,13 +227,13 @@ namespace WL
 
 	static st touch_event(_Window32* win, WL::TouchEvent::TouchType type, LPARAM l)
 	{
-		if(win->response_)
+		if(win->dispatcher)
 		{
 			Point p;
 			p.set(LOWORD(l), HIWORD(l));
 			WL::TouchEvent e;
 			if(!e.init(type, 1, &p)) return FALSE;
-			win->response_->event_for_touch(&e);
+			win->dispatcher->event_for_touch(&e);
 			return TRUE;
 		}
 		return FALSE;
@@ -228,9 +242,9 @@ namespace WL
 	static void update_frame(_Window32* win)
 	{
 		RECT r;
-		GetWindowRect(win->hwnd_, &r);
-		win->frame_.x = r.left;
-		win->frame_.y = r.top;
+		GetWindowRect(win->hwnd, &r);
+		win->frame.x = r.left;
+		win->frame.y = r.top;
 	}
 	static LRESULT CALLBACK Window_Process(HWND hWnd, UINT message, WPARAM w, LPARAM l)
 	{
@@ -249,13 +263,40 @@ namespace WL
 					if(message == WM_LBUTTONUP) { if(touch_event(win, WL::TouchEvent::Up, l)) return 0; }
 					else
 					{
-						if(message == WM_MOUSEMOVE) { if(touch_event(win, WL::TouchEvent::Move, l)) return 0; }
+						if(message == WM_MOUSEMOVE)
+						{
+							if(!win->is_mouse_track)
+							{
+								TRACKMOUSEEVENT track = {0};
+								track.cbSize = sizeof(TRACKMOUSEEVENT);
+								track.dwFlags = TME_LEAVE | TME_HOVER;
+								track.hwndTrack = hWnd;
+								track.dwHoverTime = 10;
+								TrackMouseEvent(&track);
+								win->is_mouse_track = TRUE;
+							}
+							if(touch_event(win, WL::TouchEvent::Move, l))
+								return 0;
+						}
 						else
 						{
-							if(message == WM_EXITSIZEMOVE) { update_frame(win); return 0; }
+							if(message == WM_MOUSEHOVER) { if(touch_event(win, WL::TouchEvent::Enter, l)) return 0; }
 							else
 							{
+								if(message == WM_MOUSELEAVE)
+								{
+									win->is_mouse_track = FALSE;
+									if(touch_event(win, WL::TouchEvent::Leave, l))
+										return 0;
+								}
+								else
+								{
+									if(message == WM_EXITSIZEMOVE) { update_frame(win); return 0; }
+									else
+									{
 
+									}
+								}
 							}
 						}
 					}

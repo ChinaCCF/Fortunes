@@ -32,6 +32,16 @@ namespace WL
 	public:
 		void set(st x, st y, st w, st h) { Point::set(x, y); Size::set(w, h); }
 
+		st operator ==(const Rect& r)
+		{
+			if(x != r.x)  return FALSE;
+			if(y != r.y)  return FALSE;
+			if(w != r.w)  return FALSE;
+			if(h != r.h)  return FALSE;
+			return TRUE;
+		}
+		st operator !=(const Rect& r) { return !this->operator==(r); }
+
 		void move_to_horizontal_center_in(const Rect* rect) { x = (rect->w - w) / 2 + rect->x; }
 		void move_to_vertical_center_in(const Rect* rect) { y = (rect->h - h) / 2 + rect->y; }
 		void move_to_right_in(const Rect* rect) { x = rect->w - w + rect->x; }

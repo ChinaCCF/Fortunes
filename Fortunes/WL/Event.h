@@ -56,9 +56,9 @@ namespace WL
 		st init(KeyType type, st val);
 
 		s64 get_time();
-		KeyType get_type();
+		const KeyType get_type();
 		char get_char();
-		KeyValue get_key();
+		const KeyValue get_key();
 	};
 
 	class _TouchEvent;
@@ -70,7 +70,9 @@ namespace WL
 		{
 			Down,
 			Up,
-			Move
+			Move,
+			Enter,
+			Leave
 		};
 		TouchEvent();
 		~TouchEvent();
@@ -85,8 +87,8 @@ namespace WL
 	class IResponse
 	{
 	public:
-		virtual st event_for_keyboard(KeyBoardEvent* e) { return FALSE; }
-		virtual st event_for_touch(TouchEvent* e) { return FALSE; }
-		virtual void redraw(IRender* render, Rect* r) {}
+		virtual st event_for_keyboard(const KeyBoardEvent* e) { return FALSE; }
+		virtual st event_for_touch(const TouchEvent* e) { return FALSE; }
+		virtual st test_point(const Point* p) { return FALSE; }
 	};
 }
