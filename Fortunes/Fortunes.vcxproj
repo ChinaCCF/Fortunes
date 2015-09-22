@@ -89,6 +89,9 @@
     <ClInclude Include="WL\Window.h" />
     <ClInclude Include="WL\Window32.h" />
     <ClInclude Include="WL\WindowControls\Button.h" />
+    <ClInclude Include="WL\WindowControls\Image.h" />
+    <ClInclude Include="WL\WindowControls\Label.h" />
+    <ClInclude Include="WL\WindowControls\TextInput.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CL\CL.cpp" />
@@ -97,10 +100,14 @@
     <ClCompile Include="Fortunes.cpp" />
     <ClCompile Include="UI\Login.cpp" />
     <ClCompile Include="WL\Event.cpp" />
+    <ClCompile Include="WL\Graphics\Graphics.cpp" />
     <ClCompile Include="WL\Graphics\Render.cpp" />
     <ClCompile Include="WL\Window.cpp" />
     <ClCompile Include="WL\Window32.cpp" />
     <ClCompile Include="WL\WindowControls\Button.cpp" />
+    <ClCompile Include="WL\WindowControls\Image.cpp" />
+    <ClCompile Include="WL\WindowControls\Label.cpp" />
+    <ClCompile Include="WL\WindowControls\TextInput.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource\Fortunes.rc" />

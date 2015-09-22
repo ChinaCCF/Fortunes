@@ -1,6 +1,8 @@
 #include <CL/CL.h>
 #include <math.h>
 #include <CL/Object/String.h>
+#include <Windows.h>
+#include <CL/Memory.h>
 
 #pragma once
 
@@ -42,18 +44,45 @@ namespace WL
 		st operator != (const Color& c) { return !this->operator==(c); }
 	};
 
+	class _Font;
 	class Font
 	{
+		_Font* self;
+	public: 
+		Font() { self = NULL; }
+		~Font(); 
+		st init();
+
+		void set_size(st val);
+		st get_size() const;
+
+		void set_is_bold(st val);
+		st get_is_bold() const;
+
+		void set_name(const char* name);
+		const char* get_name() const;
+
+		void* get_HFONT();
+
+		Font* copy();
+		Font& operator = (const Font&);
+	};
+
+	class _ImageData;
+	class ImageData
+	{
+		_ImageData* self;
 	public:
-		char name[32];
-		st size;
-		st is_bold; 
-		Font()
-		{
-			size = 15;
-			is_bold = FALSE;
-			CL::StringUtil::string_copy(name, 32, "ÐÂËÎÌå");
-		}
-		void set(st s, st b, const char* n) { size = s; is_bold = b; CL::StringUtil::string_copy(name, 32, n); }
+		ImageData() { self = NULL; }
+		~ImageData();
+		st init();
+		 
+		void set_file(const char* file);
+		const char* get_file();
+
+		st get_width();
+		st get_height();
+
+		void* get_image();//Gdiplus::Image
 	};
 }

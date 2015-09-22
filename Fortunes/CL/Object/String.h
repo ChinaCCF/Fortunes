@@ -9,6 +9,11 @@ namespace CL
 	class StringUtil
 	{
 	public:
+#if CL_IS_DEBUG
+		static char* string_alloc(const char*str, const char* file, st line);
+#else
+		static char* string_alloc(const char*str);
+#endif
 		static void string_copy(char* buf, st buf_size, const char* str);
 		static void format(char* buf, st buf_size, const char* format_str, ...);
 
@@ -31,7 +36,11 @@ namespace CL
 		//static st utf8_to_wchar(const wchar* str, char* buf, st buf_count);
 	};
 
- 
+#if CL_IS_DEBUG
+#define cl_string_alloc(x) CL::StringUtil::string_alloc(x, __FILE__, __LINE__)
+#else
+#define cl_string_alloc(x) CL::StringUtil::string_alloc(x)
+#endif
 
 	/*class String : public virtual Object
 	{

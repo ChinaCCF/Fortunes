@@ -12,17 +12,16 @@ namespace WL
 		HWND hwnd;
 		char* text;
 		Rect frame;
-		st text_size;
 		st is_layer;
 		st is_child;
 		ft alpha;
 		st has_show;
 		BaseWindow* dispatcher;
 		st is_mouse_track;
+		WNDPROC ctrl_proc;//warnning, this member is only valid in 32bit system
 		_Window32()
 		{
 			hwnd = NULL;
-			text_size = 64;
 			text = NULL;
 			frame.set(0, 0, 100, 100);
 			is_layer = FALSE;
@@ -31,12 +30,14 @@ namespace WL
 			alpha = 1.0;
 			dispatcher = NULL;
 			is_mouse_track = FALSE;
+			ctrl_proc = NULL;
 		}
 	};
 
 	/************************************************************************************************/
 	/************************************************************************************************/
 	static LRESULT CALLBACK Window_Process(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+	static LRESULT CALLBACK Text_Process(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 	static HINSTANCE g_application_instance = NULL;
 
@@ -56,11 +57,11 @@ namespace WL
 				memset(&wcex, 0, sizeof(WNDCLASSEXA));
 				wcex.cbSize = sizeof(WNDCLASSEXA);
 				wcex.style = CS_HREDRAW | CS_VREDRAW;
-				wcex.cbWndExtra = sizeof(void*);
+				//wcex.cbWndExtra = sizeof(void*);
 				wcex.lpfnWndProc = fun;
 				wcex.hInstance = g_application_instance;
 				wcex.hCursor = LoadCursorA(NULL, IDC_ARROW);
-				wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+				//wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
 				wcex.lpszClassName = class_name;
 				return RegisterClassExA(&wcex) != NULL;
 			}
@@ -68,10 +69,11 @@ namespace WL
 		return TRUE;
 	}
 
-	static HWND create_window(const char* class_name)
+	static HWND create_window(const char* class_name, st style)
 	{
 		DWORD flags = WS_POPUP;
 		DWORD ex_flags = WS_EX_ACCEPTFILES | WS_EX_APPWINDOW | WS_EX_NOPARENTNOTIFY | WS_EX_TRANSPARENT;
+		if(style) flags |= style;
 		return CreateWindowExA(ex_flags, class_name, ""/*title*/, flags, 0, 0, 1, 1, NULL/*parent*/, NULL/*menu*/, g_application_instance, NULL/*extra*/);
 	}
 	/************************************************************************************************/
@@ -88,30 +90,36 @@ namespace WL
 		cl_delete(self);
 	}
 
-	st Window32::init()
+	st Window32::init(const char* class_name, st style)
 	{
 		self = cl_new(_Window32);
 		if(self == NULL) return FALSE;
-		self->text = cl_alloc_type_with_count(char, self->text_size);
-		if(self->text == NULL) return FALSE;
 
-		const char* class_name = "WLWindow";
-		if(!register_window_class(class_name, Window_Process)) return FALSE;
-		self->hwnd = create_window(class_name);
-		if(self->hwnd != NULL)
+		if(class_name == NULL)
 		{
-			SetWindowLongA(self->hwnd, 0, (LONG)self);
-			return TRUE;
+			class_name = "WLWindow";
+			if(!register_window_class(class_name, Window_Process)) return FALSE;
 		}
-		return FALSE;
+		self->hwnd = create_window(class_name, style);
+		if(self->hwnd)
+			SetWindowLongPtrA(self->hwnd, GWLP_USERDATA, (LONG)self);
+		else
+			return FALSE;
+
+		if(strcmp(class_name, "edit") == 0)
+			self->ctrl_proc = (WNDPROC)SetWindowLongPtrA(self->hwnd, GWL_WNDPROC, (LONG)Text_Process);
+
+		return TRUE;
 	}
 
 	HWND Window32::get_handle() { return self->hwnd; }
 	void Window32::set_ico(st ico) { SendMessageA(self->hwnd, WM_SETICON, ICON_SMALL, (LPARAM)LoadIconA(g_application_instance, MAKEINTRESOURCEA(ico))); }
 	void Window32::set_title(const char* title)
 	{
-		CL::StringUtil::string_copy(self->text, self->text_size, title);
-		SetWindowTextA(self->hwnd, self->text);
+		cl_free(self->text);
+		self->text = cl_string_alloc(title);
+		if(self->text)
+			SetWindowTextA(self->hwnd, self->text);
 	}
 	const char* Window32::get_title() { return self->text; }
 	void Window32::set_parent(HWND parent)
@@ -137,12 +145,12 @@ namespace WL
 	{
 		if(val != self->is_layer)
 		{
-			st style = GetWindowLongA(self->hwnd, GWL_EXSTYLE);
+			st style = GetWindowLongPtrA(self->hwnd, GWL_EXSTYLE);
 			if(val)
 				style |= WS_EX_LAYERED;
 			else
 				style ^= WS_EX_LAYERED;
-			SetWindowLongA(self->hwnd, GWL_EXSTYLE, style);
+			SetWindowLongPtrA(self->hwnd, GWL_EXSTYLE, style);
 			self->is_layer = val;
 		}
 	}
@@ -192,7 +200,7 @@ namespace WL
 	}
 	void Window32::hide() { ShowWindow(self->hwnd, SW_HIDE); }
 	void Window32::close() { cl_delete(this); }
-
+	void Window32::set_focus() { SetFocus(self->hwnd); }
 
 	void Window32::set_dispatcher(void* dispatcher) { self->dispatcher = (BaseWindow*)dispatcher; }
 	/*********************************************************************************/
@@ -249,9 +257,9 @@ namespace WL
 	static LRESULT CALLBACK Window_Process(HWND hWnd, UINT message, WPARAM w, LPARAM l)
 	{
 		if(message == WM_NCCREATE)
-			SetWindowLong(hWnd, 0, 0);
+			SetWindowLongPtrA(hWnd, GWLP_USERDATA, 0);
 
-		_Window32* win = (_Window32*)GetWindowLong(hWnd, 0);
+		_Window32* win = (_Window32*)GetWindowLongPtrA(hWnd, GWLP_USERDATA);
 		if(win)
 		{
 			if(message == WM_PAINT) { if(paint(win, w, l)) return 0; }
@@ -294,7 +302,7 @@ namespace WL
 									if(message == WM_EXITSIZEMOVE) { update_frame(win); return 0; }
 									else
 									{
-
+										//if(message == )
 									}
 								}
 							}
@@ -303,7 +311,22 @@ namespace WL
 				}
 			}
 		}
-
 		return DefWindowProc(hWnd, message, w, l);
+	}
+
+	static LRESULT CALLBACK Text_Process(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+	{
+		_Window32* win = (_Window32*)GetWindowLongPtrA(hWnd, GWLP_USERDATA);
+		switch(message)
+		{
+			case WM_CHAR:
+				{
+					WL::KeyBoardEvent e;
+					e.init(WL::KeyBoardEvent::Char, wParam);
+					if(win->dispatcher->event_for_keyboard(&e)) return 0; 
+				}
+			default:
+				return win->ctrl_proc(hWnd, message, wParam, lParam);
+		}
 	}
 }

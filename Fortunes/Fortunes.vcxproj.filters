@@ -57,6 +57,15 @@
     <ClInclude Include="WL\WindowControls\Button.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="WL\WindowControls\Image.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="WL\WindowControls\Label.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="WL\WindowControls\TextInput.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Fortunes.cpp">
@@ -69,9 +78,6 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="CL\Memory.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="UI\Login.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="WL\Window.cpp">
@@ -87,6 +93,21 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="WL\WindowControls\Button.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="WL\WindowControls\Image.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="WL\WindowControls\Label.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="WL\Graphics\Graphics.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="WL\WindowControls\TextInput.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\Login.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

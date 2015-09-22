@@ -87,8 +87,8 @@ namespace WL
 	class IResponse
 	{
 	public:
-		virtual st event_for_keyboard(const KeyBoardEvent* e) { return FALSE; }
-		virtual st event_for_touch(const TouchEvent* e) { return FALSE; }
-		virtual st test_point(const Point* p) { return FALSE; }
+		virtual st event_for_keyboard(KeyBoardEvent* e) { return FALSE; }
+		virtual st event_for_touch(TouchEvent* e) { return FALSE; }
+		virtual st test_point(Point* p) { return FALSE; }
 	};
 }

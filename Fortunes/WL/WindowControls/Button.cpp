@@ -8,54 +8,45 @@ namespace WL
 		class _Button
 		{
 		public:
-			enum
-			{
-				Title_Size = 64
-			};
-			char title[Title_Size];
-			Font font;
 			Color bg;
-			Color font_color;
-			_Button() { CL::StringUtil::string_copy(title, Title_Size, "title"); }
+			Label* title;
+			_Button() { title = NULL; }
 		};
 
+		Button::~Button()
+		{
+			if(self) cl_delete(self->title);
+			cl_delete(self);
+		}
 		st Button::init()
 		{
 			if(!BaseWindow::init()) return FALSE;
+
 			self = cl_new(_Button);
 			if(self == NULL) return FALSE;
+
+			self->title = cl_new(Label);
+			if(self->title == NULL) return FALSE;
+			if(!self->title->init()) return FALSE;
+
+			add_window(self->title);
+			self->title->show();
 
 			return TRUE;
 		}
 
-		void Button::set_title(const char* title)
-		{
-			CL::StringUtil::string_copy(self->title, _Button::Title_Size, title);
-			update();
-		}
-		const char* Button::get_title()
+		Label* Button::get_title()
 		{
 			return self->title;
 		}
-
-		void Button::set_font(const Font* font)
-		{
-			self->font = *font;
-			update();
+		void Button::set_frame(const Rect* r) {
+			Rect ir = *r;
+			ir.x = 0;
+			ir.y = 0;
+			self->title->set_frame(&ir); 
+			BaseWindow::set_frame(r);
 		}
-		void Button::get_font(Font* font)
-		{
-			*font = self->font;
-		}
-		void Button::set_title_color(const Color* c)
-		{
-			self->font_color = *c;
-			update();
-		}
-		void Button::get_title_color(Color* c)
-		{
-			*c = self->font_color;
-		}
+		void Button::set_frame(st x, st y, st w, st h) { self->title->set_frame(0, 0, w, h); BaseWindow::set_frame(x, y, w, h); }
 
 		void Button::set_light(const Color* c)
 		{
@@ -104,25 +95,6 @@ namespace WL
 					set_normal(NULL);
 			}
 			return TRUE;
-		}
-
-		void Button::redraw(IRender* render, Rect* r)
-		{
-			BaseWindow::redraw(render, r);
-			if(strlen(self->title) > 0)
-			{
-				render->set_font(&self->font);
-				render->set_color(&self->font_color);
-
-				WL::Size size;
-				render->text_size(self->title, &size);
-
-				Rect target;
-				target.set(0, 0, size.w, size.h);
-				target.move_to_center_in(r);
-
-				render->draw_text(&target, self->title);
-			}
 		}
 	}
 }

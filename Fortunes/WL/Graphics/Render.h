@@ -29,13 +29,14 @@ namespace WL
 		virtual void offset_y(st y) {}
 		virtual void offset(st x, st y) {}
 
-		virtual void set_font(const Font* font) {}
+		virtual void set_font(Font* font) {}
 		virtual st text_height(const char* str) { return 0; }
 		virtual st text_width(const char* str) { return 0; }
 		virtual void text_size(const char* str, Size* size) {}
 		virtual void draw_text(const Rect* r, const char* str) {}
 
-		virtual void draw_image() {}
+		virtual void draw_image(ImageData* img, const Rect* r) {}
+
 		static IRender* create_gdi_render(HDC hdc);
 	};
 }

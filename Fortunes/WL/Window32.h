@@ -13,7 +13,7 @@ namespace WL
 	public:
 		Window32();
 		~Window32();
-		st init();
+		st init(const char* class_name = NULL, st style = 0);
 	public:
 		HWND get_handle();
 		void set_ico(st ico);//resource id
@@ -33,6 +33,7 @@ namespace WL
 		void show();
 		void hide();
 		void close();
+		void set_focus();
 
 		void set_dispatcher(void* dispatcher);
 	public:

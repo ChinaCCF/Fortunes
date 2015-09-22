@@ -16,14 +16,23 @@ namespace WL
 	public:
 		st w, h;
 		Size() { w = 0; h = 0; }
+		Size(st _w, st _h) { w = _w; h = _h; }
 		void set(st _w, st _h) { w = _w; h = _h; }
 
 		void fit_in(const Size* size)
 		{
+			if(size->w == 0 || size->h == 0) return;
+
 			if((w / h) <= (size->w / size->h))
+			{
+				w = size->w;
 				h = w * (size->h / size->w);
+			}
 			else
+			{
+				h = size->h;
 				w = h * (size->w / size->h);
+			}
 		}
 	};
 
@@ -56,6 +65,14 @@ namespace WL
 		{
 			this->move_to_bottom_in(rect);
 			this->move_to_right_in(rect);
+		}
+
+		void fit_in(const Rect* r)
+		{
+			Size si(w, h);
+			Size so(r->w, r->h);
+			si.fit_in(&so);
+			w = si.w; h = si.h;
 		}
 		/**************************************************/
 		st is_intersect_with(const Rect* rect)

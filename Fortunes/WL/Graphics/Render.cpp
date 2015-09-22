@@ -84,17 +84,17 @@ namespace WL
 		void offset_y(st y) {}
 		void offset(st x, st y) {}
 
-		void set_font(const Font* f)
+		void set_font(Font* f)
 		{
 			Gdiplus::FontStyle style;
-			if(f->is_bold)
+			if(f->get_is_bold())
 				style = Gdiplus::FontStyle::FontStyleBold;
 			else
 				style = Gdiplus::FontStyle::FontStyleRegular;
 
 			wchar font_name[32];
-			CL::StringUtil::char_to_wchar(f->name, font_name, 32);
-			Gdiplus::Font* tmp = new Gdiplus::Font(font_name, (Gdiplus::REAL)f->size, style);
+			CL::StringUtil::char_to_wchar(f->get_name(), font_name, 32);
+			Gdiplus::Font* tmp = new Gdiplus::Font(font_name, (Gdiplus::REAL)f->get_size(), style);
 			if(tmp) { delete font; font = tmp; }
 		}
 		st text_height(const char* str)
@@ -145,6 +145,11 @@ namespace WL
 			graphics->SetClip(&old_val);
 			cl_free(wstr);
 			delete brush;
+		}
+		void draw_image(ImageData* img, const Rect* r)
+		{
+			if(img->get_image() == NULL) return;
+			graphics->DrawImage((Gdiplus::Image*)img->get_image(), Gdiplus::Rect(r->x, r->y, r->w, r->h));
 		}
 	};
 	/*****************************************************************/

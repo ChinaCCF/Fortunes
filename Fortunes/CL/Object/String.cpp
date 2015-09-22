@@ -2,15 +2,35 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <Windows.h>
+#include <CL/Memory.h>
 
 namespace CL
 {
-	void  StringUtil::string_copy(char* buf, st buf_size, const char* str)
+	void StringUtil::string_copy(char* buf, st buf_size, const char* str)
 	{
 		st len = strlen(str);
 		if(len >= buf_size) len = buf_size - 1;
 		memcpy(buf, str, len + 1);
 	}
+#if CL_IS_DEBUG
+	char* StringUtil::string_alloc(const char* str, const char* file, st line)
+	{
+		st len = strlen(str) + 1;
+		char* buf = (char*)CL::MemoryUtil::_alloc(len, file, line);
+		if(buf == NULL) return buf;
+		memcpy(buf, str, len);
+		return buf;
+	}
+#else
+	char* StringUtil::string_alloc(const char* str)
+	{
+		st len = strlen(str) + 1;
+		char* buf = (char*)CL::MemoryUtil::alloc(len);
+		if(buf == NULL) return buf;
+		memcpy(buf, str, len);
+		return buf;
+	}
+#endif
 
 	void StringUtil::format(char* buf, st buf_size, const char* format_str, ...)
 	{
