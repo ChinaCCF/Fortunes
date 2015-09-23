@@ -6,18 +6,18 @@ namespace WL
 	class Point
 	{
 	public:
-		st x, y;
+		ft x, y;
 		Point() { x = 0; y = 0; }
-		void set(st _x, st _y) { x = _x; y = _y; }
+		void set(ft _x, ft _y) { x = _x; y = _y; }
 	};
 
 	class Size
 	{
 	public:
-		st w, h;
+		ft w, h;
 		Size() { w = 0; h = 0; }
-		Size(st _w, st _h) { w = _w; h = _h; }
-		void set(st _w, st _h) { w = _w; h = _h; }
+		Size(ft _w, ft _h) { w = _w; h = _h; }
+		void set(ft _w, ft _h) { w = _w; h = _h; }
 
 		void fit_in(const Size* size)
 		{
@@ -39,7 +39,7 @@ namespace WL
 	class Rect : public Point, public Size
 	{
 	public:
-		void set(st x, st y, st w, st h) { Point::set(x, y); Size::set(w, h); }
+		void set(ft x, ft y, ft w, ft h) { Point::set(x, y); Size::set(w, h); }
 
 		st operator ==(const Rect& r)
 		{
@@ -74,6 +74,20 @@ namespace WL
 			si.fit_in(&so);
 			w = si.w; h = si.h;
 		}
+
+		st test_point(const Point* p)
+		{
+			if(p->x < 0 || p->y < 0 || p->x > w || p->y > h)
+				return FALSE;
+			return TRUE;
+		}
+		void shrink(st val)
+		{
+			x += val;
+			y += val;
+			w -= 2 * val;
+			h -= 2 * val;
+		}
 		/**************************************************/
 		st is_intersect_with(const Rect* rect)
 		{
@@ -91,10 +105,10 @@ namespace WL
 				r.x = CL::MAX(rect->x, x);
 				r.y = CL::MAX(rect->y, y);
 
-				st right = CL::MIN(rect->x + rect->w, x + w);
+				ft right = CL::MIN(rect->x + rect->w, x + w);
 				r.w = right - r.x;
 
-				st bottom = CL::MIN(rect->y + rect->h, y + h);
+				ft bottom = CL::MIN(rect->y + rect->h, y + h);
 				r.h = bottom - r.y;
 			}
 			return r;

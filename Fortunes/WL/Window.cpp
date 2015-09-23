@@ -37,7 +37,7 @@ namespace WL
 	}
 
 	void BaseWindow::set_frame(const Rect* r) { self->win32->set_frame(r); update(); }
-	void BaseWindow::set_frame(st x, st y, st w, st h) { self->win32->set_frame(x, y, w, h); update(); }
+	void BaseWindow::set_frame(ft x, ft y, ft w, ft h) { self->win32->set_frame(x, y, w, h); update(); }
 	void BaseWindow::get_frame(Rect* r) { self->win32->get_frame(r); }
 
 	void BaseWindow::set_background_color(const Color* c)
@@ -127,20 +127,6 @@ namespace WL
 
 	st Window::event_for_touch(TouchEvent* e)
 	{
-		if(e->get_type() != WL::TouchEvent::Move)
-		{
-			char buf[32];
-			const char* action = "down";
-			if(e->get_type() == WL::TouchEvent::Up) action = "up";
-			else
-			{
-				if(e->get_type() == WL::TouchEvent::Enter) action = "enter";
-				else action = "leave";
-			}
-			CL::StringUtil::format(buf, 32, "%d, %d   %s\n", e->get_points()[0].x, e->get_points()[0].y, action);
-			cl_printf(buf);
-		}
-
 		if(e->get_type() == WL::TouchEvent::Down)
 			SendMessage(BaseWindow::self->win32->get_handle(), WM_SYSCOMMAND, SC_MOVE | HTCAPTION, 0);
 		return TRUE;

@@ -26,14 +26,14 @@ namespace WL
 		}
 		~GDI()
 		{
-			if(color) cl_delete(color);
-			if(font) delete font;
+			delete color;
+			 delete font;
 			if(graphics)
 			{
 				graphics->ReleaseHDC(hdc);
-				cl_delete(graphics);
+				delete graphics;
 			}
-			if(gdiplus_token) 	Gdiplus::GdiplusShutdown(gdiplus_token);
+			if(gdiplus_token) Gdiplus::GdiplusShutdown(gdiplus_token);
 		}
 		st init(HDC hdc)
 		{
@@ -46,7 +46,7 @@ namespace WL
 			if(graphics == NULL) return FALSE;
 			graphics->SetSmoothingMode(Gdiplus::SmoothingModeHighQuality);
 
-			color = cl_new(Gdiplus::Color);
+			color = new Gdiplus::Color();
 			if(color == NULL)return FALSE;
 			font = new Gdiplus::Font(L"ÐÂËÎÌå", 15, Gdiplus::FontStyle::FontStyleRegular);
 			if(font == NULL) return FALSE;
@@ -57,26 +57,39 @@ namespace WL
 		void set_color(ft a, st r, st g, st b) { color->SetValue(Gdiplus::Color::MakeARGB((BYTE)(a * 255), (BYTE)r, (BYTE)g, (BYTE)b)); }
 		void set_color(const Color* c) { color->SetValue(Gdiplus::Color::MakeARGB((BYTE)(c->alpha * 255), (BYTE)c->red, (BYTE)c->green, (BYTE)c->blue)); }
 
-		void set_pen_width(st width) { width = width; }
+		void set_pen_width(st _width) { width = _width; }
 
-		virtual void fill_rect(st x, st y, st w, st h)
+		void draw_line(Point* p1, Point* p2)
+		{
+			Gdiplus::Pen* pen = new Gdiplus::Pen(*color, (Gdiplus::REAL)width);
+			graphics->DrawLine(pen, Gdiplus::Point((INT)p1->x, (INT)p1->y), Gdiplus::Point((INT)p2->x, (INT)p2->y));
+			delete pen;
+		}
+
+		virtual void fill_rect(ft x, ft y, ft w, ft h)
 		{
 			Gdiplus::SolidBrush* brush = new Gdiplus::SolidBrush(*color);
-			graphics->FillRectangle(brush, Gdiplus::Rect(x, y, w, h));
+			graphics->FillRectangle(brush, Gdiplus::Rect((st)x, (st)y, (st)w, (st)h));
 			delete brush;
 		}
 		void fill_rect(const Rect* r) { fill_rect(r->x, r->y, r->w, r->h); }
 		void draw_rect(const Rect* r)
 		{
 			Gdiplus::Pen* pen = new Gdiplus::Pen(*color, (Gdiplus::REAL)width);
-			graphics->DrawRectangle(pen, r->x, r->y, r->w, r->h);
+			graphics->DrawRectangle(pen, (Gdiplus::REAL)r->x, (Gdiplus::REAL)r->y, (Gdiplus::REAL)r->w, (Gdiplus::REAL)r->h);
 			delete pen;
 		}
 
 		void fill_rect_with_corner(const Rect* r, st corner) {}
 		void draw_rect_with_corner(const Rect* r, st corner) {}
 
-		void fill_ellipse(const Rect* r) {}
+		void fill_ellipse(const Rect* r) { fill_ellipse(r->x, r->y, r->w, r->h); }
+		void fill_ellipse(ft x, ft y, ft w, ft h)
+		{
+			Gdiplus::SolidBrush* brush = new Gdiplus::SolidBrush(*color);
+			graphics->FillEllipse(brush, Gdiplus::Rect((st)x, (st)y, (st)w, (st)h));
+			delete brush;
+		}
 		void draw_ellipse(const Rect* r) {}
 
 		void set_clip(const Rect* r) {}
@@ -97,13 +110,13 @@ namespace WL
 			Gdiplus::Font* tmp = new Gdiplus::Font(font_name, (Gdiplus::REAL)f->get_size(), style);
 			if(tmp) { delete font; font = tmp; }
 		}
-		st text_height(const char* str)
+		ft text_height(const char* str)
 		{
 			Size size;
 			text_size(str, &size);
 			return size.h;
 		}
-		st text_width(const char* str)
+		ft text_width(const char* str)
 		{
 			Size size;
 			text_size(str, &size);
@@ -138,7 +151,7 @@ namespace WL
 			Gdiplus::Region old_val;
 			graphics->GetClip(&old_val);
 
-			Gdiplus::Region new_val(Gdiplus::Rect(r->x, r->y, r->w, r->h));
+			Gdiplus::Region new_val(Gdiplus::Rect((st)r->x, (st)r->y, (st)r->w, (st)r->h));
 			graphics->SetClip(&new_val);
 
 			graphics->DrawString(wstr, -1, font, Gdiplus::PointF((Gdiplus::REAL)r->x, (Gdiplus::REAL)r->y), brush);
@@ -149,7 +162,7 @@ namespace WL
 		void draw_image(ImageData* img, const Rect* r)
 		{
 			if(img->get_image() == NULL) return;
-			graphics->DrawImage((Gdiplus::Image*)img->get_image(), Gdiplus::Rect(r->x, r->y, r->w, r->h));
+			graphics->DrawImage((Gdiplus::Image*)img->get_image(), Gdiplus::Rect((st)r->x, (st)r->y, (st)r->w, (st)r->h));
 		}
 	};
 	/*****************************************************************/

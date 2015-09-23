@@ -8,6 +8,10 @@ namespace Fortunes
 	{ 
 		_Login* self;
 	public:
+		Login() { self = NULL; }
+		~Login();
 		st init();
+
+		virtual void redraw(WL::IRender* render, WL::Rect* r);
 	};
 }

@@ -19,7 +19,7 @@ namespace WL
 		st init(const char* class_name = NULL, st style = 0);
 
 		virtual void set_frame(const Rect* r);
-		virtual void set_frame(st x, st y, st w, st h);
+		virtual void set_frame(ft x, ft y, ft w, ft h);
 		virtual void get_frame(Rect* r);
 
 		virtual void set_background_color(const Color* c);

@@ -132,13 +132,13 @@ namespace WL
 	}
 	HWND Window32::get_parent() { return GetParent(self->hwnd); }
 	void Window32::set_frame(const Rect* r) { set_frame(r->x, r->y, r->w, r->h); }
-	void Window32::set_frame(st x, st y, st w, st h)
+	void Window32::set_frame(ft x, ft y, ft w, ft h)
 	{
 		st need_redraw = FALSE;
 		if(w != self->frame.w || h != self->frame.h)
 			need_redraw = TRUE;
 		self->frame.set(x, y, w, h);
-		MoveWindow(self->hwnd, x, y, w, h, need_redraw);
+		MoveWindow(self->hwnd, (st)x, (st)y, (st)w, (st)h, need_redraw);
 	}
 	void Window32::get_frame(Rect* r) { *r = self->frame; }
 	void Window32::set_is_layer(st val)
@@ -189,10 +189,9 @@ namespace WL
 				screen.set(0, 0, w, h);
 
 				self->frame.move_to_center_in(&screen);
-				MoveWindow(self->hwnd, self->frame.x, self->frame.y, self->frame.w, self->frame.h, FALSE);
 			}
-			else
-				MoveWindow(self->hwnd, self->frame.x, self->frame.y, self->frame.w, self->frame.h, TRUE);
+			 
+			MoveWindow(self->hwnd, (st)self->frame.x, (st)self->frame.y, (st)self->frame.w, (st)self->frame.h, FALSE);
 			self->has_show = TRUE;
 			update();
 		}

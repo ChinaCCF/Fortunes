@@ -16,12 +16,15 @@ namespace WL
 
 			void set_text(const char* text);
 			const char* get_text();
+			st get_text_length();
 
 			void set_font(Font* font);
 			void get_font(Font* font);
 
 			void set_is_password(st val);
 			st get_is_password();
+
+			void set_max_length(st len);
 
 			virtual void set_focus();
 

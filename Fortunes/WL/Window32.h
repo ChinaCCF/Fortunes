@@ -22,7 +22,7 @@ namespace WL
 		void set_parent(HWND parent);
 		HWND get_parent();
 		void set_frame(const Rect* r);
-		void set_frame(st x, st y, st w, st h);
+		void set_frame(ft x, ft y, ft w, ft h);
 		void get_frame(Rect* r);
 		void set_is_layer(st val);
 		st get_is_layer();

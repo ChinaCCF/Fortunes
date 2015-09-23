@@ -27,7 +27,7 @@ namespace WL
 			self = cl_new(_Label);
 			if(self == NULL)
 				return FALSE;
-
+			if(!self->font.init()) return FALSE;
 			return TRUE;
 		}
 		void Label::set_text(const char* text)
@@ -86,6 +86,7 @@ namespace WL
 					if(align == 1)
 						target.move_to_bottom_in(r);
 				}
+				target.y += target.h * 0.1;
 				render->draw_text(&target, self->text);
 			}
 		}

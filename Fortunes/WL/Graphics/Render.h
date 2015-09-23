@@ -14,14 +14,17 @@ namespace WL
 
 		virtual void set_pen_width(st width) {}
 
+		virtual void draw_line(Point* p1, Point* p2) {}
+
 		virtual void fill_rect(const Rect* r) {}
-		virtual void fill_rect(st x, st y, st w, st h) {}
+		virtual void fill_rect(ft x, ft y, ft w, ft h) {}
 		virtual void draw_rect(const Rect* r) {}
 
 		virtual void fill_rect_with_corner(const Rect* r, st corner) {}
 		virtual void draw_rect_with_corner(const Rect* r, st corner) {}
 
 		virtual void fill_ellipse(const Rect* r) {}
+		virtual void fill_ellipse(ft x, ft y, ft w, ft h) {}
 		virtual void draw_ellipse(const Rect* r) {}
 
 		virtual void set_clip(const Rect* r) {}
@@ -30,8 +33,8 @@ namespace WL
 		virtual void offset(st x, st y) {}
 
 		virtual void set_font(Font* font) {}
-		virtual st text_height(const char* str) { return 0; }
-		virtual st text_width(const char* str) { return 0; }
+		virtual ft text_height(const char* str) { return 0; }
+		virtual ft text_width(const char* str) { return 0; }
 		virtual void text_size(const char* str, Size* size) {}
 		virtual void draw_text(const Rect* r, const char* str) {}
 
