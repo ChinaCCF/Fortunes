@@ -76,11 +76,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CL\CL.h" />
+    <ClInclude Include="CL\IO\File.h" />
     <ClInclude Include="CL\Memory.h" />
     <ClInclude Include="CL\Object\Array.h" />
     <ClInclude Include="CL\Object\String.h" />
+    <ClInclude Include="FNET\cJSON.h" />
+    <ClInclude Include="FNET\http.h" />
     <ClInclude Include="Resource\Resource.h" />
+    <ClInclude Include="UI\Common.h" />
     <ClInclude Include="UI\Login.h" />
+    <ClInclude Include="UI\Main.h" />
     <ClInclude Include="WL\Event.h" />
     <ClInclude Include="WL\Graphics\Geometry.h" />
     <ClInclude Include="WL\Graphics\Graphics.h" />
@@ -95,10 +100,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CL\CL.cpp" />
+    <ClCompile Include="CL\IO\File.cpp" />
     <ClCompile Include="CL\Memory.cpp" />
     <ClCompile Include="CL\Object\String.cpp" />
+    <ClCompile Include="FNET\cJSON.cpp" />
+    <ClCompile Include="FNET\http.cpp" />
     <ClCompile Include="Fortunes.cpp" />
+    <ClCompile Include="UI\Common.cpp" />
     <ClCompile Include="UI\Login.cpp" />
+    <ClCompile Include="UI\Main.cpp" />
     <ClCompile Include="WL\Event.cpp" />
     <ClCompile Include="WL\Graphics\Graphics.cpp" />
     <ClCompile Include="WL\Graphics\Render.cpp" />

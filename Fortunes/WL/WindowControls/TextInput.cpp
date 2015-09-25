@@ -15,7 +15,10 @@ namespace WL
 			st max_len;
 			st len;
 			st has_change;
-			_TextInput() { text = NULL; is_password = FALSE; max_len = 999; len = 0; has_change = FALSE; }
+			TextInputFilter filter;
+			void* extra;
+
+			_TextInput() { text = NULL; is_password = FALSE; max_len = 999; len = 0; has_change = FALSE; filter = NULL; extra = NULL; }
 		};
 
 		TextInput::~TextInput()
@@ -103,20 +106,27 @@ namespace WL
 
 		st TextInput::event_for_keyboard(WL::KeyBoardEvent* e)
 		{
-			char buf[16];
-			CL::StringUtil::format(buf, 16, "%c\n", e->get_char());
-			cl_printf(buf);
 			if(e->get_type() == WL::KeyBoardEvent::Char && e->get_char() == 8)
 			{
 				self->has_change = TRUE;
+				if(self->filter)
+					return self->filter(this, e, self->extra);
 				return FALSE;
 			}
-				
+
 			if(get_text_length() >= self->max_len)
 				return TRUE;
 
 			self->has_change = TRUE;
+			if(self->filter)
+				return self->filter(this, e, self->extra);
 			return FALSE;
+		}
+
+		void TextInput::set_filter(TextInputFilter filter, void* extra)
+		{
+			self->filter = filter;
+			self->extra = extra;
 		}
 	}
 }

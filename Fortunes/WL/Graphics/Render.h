@@ -40,6 +40,8 @@ namespace WL
 
 		virtual void draw_image(ImageData* img, const Rect* r) {}
 
+		virtual void fill_gradient_rect(const Rect* r, const Color* c1, const Color* c2, const Point* p1, const Point* p2) {}
+
 		static IRender* create_gdi_render(HDC hdc);
 	};
 }

@@ -56,7 +56,7 @@ namespace WL
 
 				memset(&wcex, 0, sizeof(WNDCLASSEXA));
 				wcex.cbSize = sizeof(WNDCLASSEXA);
-				wcex.style = CS_HREDRAW | CS_VREDRAW;
+				wcex.style = CS_HREDRAW | CS_VREDRAW | CS_SAVEBITS;
 				//wcex.cbWndExtra = sizeof(void*);
 				wcex.lpfnWndProc = fun;
 				wcex.hInstance = g_application_instance;
@@ -71,7 +71,7 @@ namespace WL
 
 	static HWND create_window(const char* class_name, st style)
 	{
-		DWORD flags = WS_POPUP;
+		DWORD flags = WS_POPUP ;
 		DWORD ex_flags = WS_EX_ACCEPTFILES | WS_EX_APPWINDOW | WS_EX_NOPARENTNOTIFY | WS_EX_TRANSPARENT;
 		if(style) flags |= style;
 		return CreateWindowExA(ex_flags, class_name, ""/*title*/, flags, 0, 0, 1, 1, NULL/*parent*/, NULL/*menu*/, g_application_instance, NULL/*extra*/);
@@ -219,11 +219,11 @@ namespace WL
 			st w = ps.rcPaint.right - ps.rcPaint.left;
 			st h = ps.rcPaint.bottom - ps.rcPaint.top;
 			WL::Rect r;
-			r.set(ps.rcPaint.left, ps.rcPaint.top, w, h);
+			r.set(0, 0, w, h);
 
 			WL::IRender* gdi = WL::IRender::create_gdi_render(hdc);
 			if(gdi == NULL) return FALSE;
-			win->dispatcher->redraw(gdi, &r);
+			win->dispatcher->redraw(gdi);
 			cl_delete(gdi);
 
 			EndPaint(win->hwnd, &ps);

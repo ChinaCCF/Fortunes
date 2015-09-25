@@ -66,6 +66,21 @@
     <ClInclude Include="WL\WindowControls\TextInput.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="UI\Main.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\Common.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CL\IO\File.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="FNET\cJSON.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="FNET\http.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Fortunes.cpp">
@@ -108,6 +123,21 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="UI\Login.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\Main.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\Common.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="CL\IO\File.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="FNET\cJSON.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="FNET\http.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

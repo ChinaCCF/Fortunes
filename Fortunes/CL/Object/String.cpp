@@ -1,7 +1,9 @@
 #include <CL/Object/String.h>
 #include <stdarg.h>
 #include <stdio.h>
+#if !CL_IS_MAC
 #include <Windows.h>
+#endif
 #include <CL/Memory.h>
 
 namespace CL
@@ -32,6 +34,10 @@ namespace CL
 	}
 #endif
 
+	st StringUtil::string_compare(const char* str1, const char* str2)
+	{
+		return strcmp(str1, str2) == 0;
+	}
 	void StringUtil::format(char* buf, st buf_size, const char* format_str, ...)
 	{
 		va_list list;

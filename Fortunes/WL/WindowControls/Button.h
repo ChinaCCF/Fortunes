@@ -50,7 +50,7 @@ namespace WL
 			Label* get_title();
 
 			void set_frame(const Rect* r);
-			void set_frame(st x, st y, st w, st h);
+			void set_frame(ft x, ft y, ft w, ft h);
 		};
 	}
 }

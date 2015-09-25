@@ -6,6 +6,10 @@
 
 namespace WL
 {
+#define TO_RECT(r) Gdiplus::Rect((INT)r->x, (INT)r->y, (INT)r->w, (INT)r->h)
+#define TO_POINT(p) Gdiplus::Point((INT)p->x, (INT)p->y)
+#define TO_POINTF(p) Gdiplus::PointF((Gdiplus::REAL)p->x, (Gdiplus::REAL)p->y)
+#define TO_COLOR(c) Gdiplus::Color((BYTE)(c->alpha * 255), c->red, c->green, c->blue)
 	/***********************************************************************************/
 	/***********************************************************************************/
 	class GDI : public IRender
@@ -27,7 +31,7 @@ namespace WL
 		~GDI()
 		{
 			delete color;
-			 delete font;
+			delete font;
 			if(graphics)
 			{
 				graphics->ReleaseHDC(hdc);
@@ -62,7 +66,7 @@ namespace WL
 		void draw_line(Point* p1, Point* p2)
 		{
 			Gdiplus::Pen* pen = new Gdiplus::Pen(*color, (Gdiplus::REAL)width);
-			graphics->DrawLine(pen, Gdiplus::Point((INT)p1->x, (INT)p1->y), Gdiplus::Point((INT)p2->x, (INT)p2->y));
+			graphics->DrawLine(pen, TO_POINT(p1), TO_POINT(p2));
 			delete pen;
 		}
 
@@ -151,10 +155,10 @@ namespace WL
 			Gdiplus::Region old_val;
 			graphics->GetClip(&old_val);
 
-			Gdiplus::Region new_val(Gdiplus::Rect((st)r->x, (st)r->y, (st)r->w, (st)r->h));
+			Gdiplus::Region new_val(TO_RECT(r));
 			graphics->SetClip(&new_val);
 
-			graphics->DrawString(wstr, -1, font, Gdiplus::PointF((Gdiplus::REAL)r->x, (Gdiplus::REAL)r->y), brush);
+			graphics->DrawString(wstr, -1, font, TO_POINTF(((Point*)r)), brush);
 			graphics->SetClip(&old_val);
 			cl_free(wstr);
 			delete brush;
@@ -162,7 +166,14 @@ namespace WL
 		void draw_image(ImageData* img, const Rect* r)
 		{
 			if(img->get_image() == NULL) return;
-			graphics->DrawImage((Gdiplus::Image*)img->get_image(), Gdiplus::Rect((st)r->x, (st)r->y, (st)r->w, (st)r->h));
+			graphics->DrawImage((Gdiplus::Image*)img->get_image(), TO_RECT(r));
+		}
+
+		void fill_gradient_rect(const Rect* r, const Color* c1, const Color* c2, const Point* p1, const Point* p2)
+		{ 
+			Gdiplus::LinearGradientBrush* brush = new Gdiplus::LinearGradientBrush(TO_POINT(p1), TO_POINT(p2), TO_COLOR(c1), TO_COLOR(c2));
+			graphics->FillRectangle(brush, TO_RECT(r));
+			delete brush;
 		}
 	};
 	/*****************************************************************/

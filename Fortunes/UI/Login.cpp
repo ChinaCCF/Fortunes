@@ -5,14 +5,18 @@
 #include <WL/WindowControls/Image.h>
 #include <WL/WindowControls/TextInput.h>
 #include <WL/Graphics/Render.h>
+#include <UI/Common.h>
+#include <CL/IO/File.h>
 
 namespace Fortunes
 {
+	static st text_filter(WL::SubWindow::TextInput* txt, WL::KeyBoardEvent* e, void* extra);
+
 	class Input :public WL::BaseWindow
 	{
 	public:
 		WL::SubWindow::TextInput* input;
-		WL::SubWindow::Image* img;
+		WL::SubWindow::Image* img; 
 
 		Input() { input = NULL; }
 		~Input() { 
@@ -20,7 +24,7 @@ namespace Fortunes
 			cl_delete(input);
 		}
 
-		st init(const char* file, st is_pwd)
+		st init(const char* file, st is_pwd, _Login* l)
 		{
 			if(!BaseWindow::init())return FALSE;
 			img = cl_new(WL::SubWindow::Image);
@@ -32,6 +36,7 @@ namespace Fortunes
 			input = cl_new(WL::SubWindow::TextInput);
 			if(!input->init()) return FALSE;
 			if(is_pwd) input->set_is_password(TRUE);
+			input->set_filter(text_filter, l);
 			add_window(input);
 			WL::Font font;
 			font.init();
@@ -49,9 +54,11 @@ namespace Fortunes
 			img->set_frame(h * 0.3, h * 0.15, h * 0.7, h * 0.7);
 			input->set_frame(h * 1.3, h * 0.15, w - h * 1.6, h * 0.7);
 		}
-		void redraw(WL::IRender* render, WL::Rect* r)
+		void set_focus() { input->set_focus(); }
+		void set_text(const char* text) { input->set_text(text); }
+		void redraw(WL::IRender* render)
 		{
-			BaseWindow::redraw(render, r);
+			BaseWindow::redraw(render);
 		}
 	};
 
@@ -60,69 +67,32 @@ namespace Fortunes
 		st is_select;
 	public:
 		SelectBtn() { is_select = NULL; }
-		void set_select(st val) { is_select = val; }
-		virtual void redraw(WL::IRender* render, WL::Rect* r)
+		void set_select(st val) { is_select = val; update(); }
+		st get_select() { return is_select; }
+
+		virtual void redraw(WL::IRender* render)
 		{
 			WL::Color c;
+			WL::Rect r;
+
+			get_frame(&r);
+			r.x = 0;
+			r.y = 0; 
+
+			c.set(239, 236, 255);
+			render->set_color(&c);
+			render->fill_rect(&r);
+
 			get_background_color(&c);
 			render->set_color(&c);
 			render->set_pen_width(1);
-			WL::Rect t = *r;
-			t.shrink(1);
-			render->draw_rect(&t);
+
+			r.shrink(1);
+			render->draw_rect(&r);
 			if(is_select)
 			{
-				t.shrink(2);
-				render->fill_rect(&t);
-			}
-		}
-	};
-
-	class CloseButton : public WL::SubWindow::BaseButton
-	{
-	public:
-		virtual void redraw(WL::IRender* render, WL::Rect* r)
-		{
-			WL::Color c;
-			get_background_color(&c);
-			render->set_color(&c);
-			WL::Rect re;
-			re = *r;
-			re.shrink(1);
-			render->fill_ellipse(&re);
-
-			if(get_status() != BaseButton::Normal)
-			{
-				WL::Color c;
-				c.set(250, 250, 250);
-				render->set_color(&c);
-				render->set_pen_width(3);
-
-				WL::Point center;
-				center.set(r->w / 2, r->h / 2);
-				ft len = CL::MIN(re.w, re.h);
-				len /= 4;
-
-				WL::Point p1, p2;
-				p1 = center;
-				p2 = center;
-
-				p1.x -= len;
-				p1.y -= len;
-
-				p2.x += len;
-				p2.y += len;
-
-				render->draw_line(&p1, &p2);
-
-				p1 = center;
-				p2 = center;
-				p1.x -= len;
-				p1.y += len;
-
-				p2.x += len;
-				p2.y -= len;
-				render->draw_line(&p1, &p2);
+				r.shrink(2);
+				render->fill_rect(&r);
 			}
 		}
 	};
@@ -137,17 +107,23 @@ namespace Fortunes
 		SelectBtn* remember;
 		WL::SubWindow::Label* lbl;
 		WL::SubWindow::Button* btn_login;
+		WL::SubWindow::Button* btn_logout;
+
 		CloseButton* close;
+		CL::File* file;
+		
 		_Login()
 		{
 			img = NULL;
 			btn_login = NULL;
+			btn_logout = NULL;
 			close = NULL;
 			lbl = NULL;
 			remember = NULL;
 			host = NULL;
 			pwd = NULL;
 			user = NULL;
+			file = NULL;
 		}
 	};
 	Login::~Login()
@@ -162,23 +138,50 @@ namespace Fortunes
 			cl_delete(self->lbl);
 			cl_delete(self->btn_login);
 			cl_delete(self->close);
+			cl_delete(self->btn_logout);
+			CL::File::close_file(self->file);
 		}
 		cl_delete(self);
 	}
-	void login_click(WL::SubWindow::BaseButton* btn, void* extra)
+	static void login_click(WL::SubWindow::BaseButton* btn, void* extra)
 	{
 		cl_printf("login\n");
 	}
 
-	void remember_click(WL::SubWindow::BaseButton* btn, void* extra)
+	static void remember_click(WL::SubWindow::BaseButton* btn, void* extra)
 	{
-		cl_printf("login\n");
-		//SelectBtn* 
+		SelectBtn* sel = (SelectBtn*)btn;
+		sel->set_select(!sel->get_select());
 	}
-	void close_click(WL::SubWindow::BaseButton* btn, void* extra)
+	static void close_click(WL::SubWindow::BaseButton* btn, void* extra)
 	{
 		PostQuitMessage(0);
 	}
+	static st text_filter(WL::SubWindow::TextInput* txt, WL::KeyBoardEvent* e, void* extra)
+	{ 
+		_Login* l = (_Login*)extra;
+		if(e->get_char() == '\t')
+		{
+			if(txt == l->user->input)
+				l->pwd->set_focus();
+			else
+			{
+				if(txt == l->pwd->input)
+					l->host->set_focus();
+				else
+				{
+					l->user->set_focus();
+				}
+			}
+		} 
+		if(e->get_char() == '\n' || e->get_char() == '\r')
+		{
+			login_click(NULL, l);
+		}
+		return FALSE;
+	}
+
+
 	st Login::init()
 	{
 		if(!WL::Window::init()) return FALSE;
@@ -197,19 +200,19 @@ namespace Fortunes
 		self->img->show();
 
 		self->user = cl_new(Input);
-		if(!self->user->init("Resource\\user.png", FALSE)) return FALSE;
+		if(!self->user->init("Resource\\user.png", FALSE, self)) return FALSE;
 		add_window(self->user);
 		self->user->set_frame(400, 80, 200, 27);
 		self->user->show();
 
 		self->pwd = cl_new(Input);
-		if(!self->pwd->init("Resource\\pwd.png", TRUE)) return FALSE;
+		if(!self->pwd->init("Resource\\pwd.png", TRUE, self)) return FALSE;
 		add_window(self->pwd);
 		self->pwd->set_frame(400, 130, 200, 27);
 		self->pwd->show();
 
 		self->host = cl_new(Input);
-		if(!self->host->init("Resource\\host.png", FALSE)) return FALSE;
+		if(!self->host->init("Resource\\host.png", FALSE, self)) return FALSE;
 		add_window(self->host);
 		self->host->set_frame(400, 180, 200, 27);
 		self->host->show();
@@ -225,7 +228,7 @@ namespace Fortunes
 		f.set_size(10);
 		self->lbl->set_font(&f);
 		self->lbl->set_text("¼Ç×¡ÃÜÂë");
-		self->lbl->set_frame(400, 222, 200, 27);
+		self->lbl->set_frame(600 - 60, 222, 60, 27);
 		self->lbl->set_horizontal_align(1);
 		self->lbl->show();
 
@@ -235,7 +238,11 @@ namespace Fortunes
 		self->remember->set_background_color(0, 111, 222);
 		self->remember->set_frame(525, 228, 15, 15);
 		self->remember->show();
-		self->remember->set_click(remember_click, this);
+		self->remember->set_click(remember_click, self);
+
+		WL::Font font;
+		font.init();
+		font.set_size(13);
 
 		self->btn_login = cl_new(WL::SubWindow::Button);
 		if(!self->btn_login->init()) return FALSE;
@@ -243,34 +250,57 @@ namespace Fortunes
 		self->btn_login->set_background_color(0, 111, 222);
 		self->btn_login->set_frame(400, 260, 200, 30);
 		self->btn_login->get_title()->set_text("µÇÂ¼");
-		WL::Font font;
-		font.init();
-		font.set_size(13);
 		self->btn_login->get_title()->set_font(&font);
 		self->btn_login->show();
-		self->btn_login->set_click(login_click, this);
+		self->btn_login->set_click(login_click, self);
 
+		self->btn_logout = cl_new(WL::SubWindow::Button);
+		if(!self->btn_logout->init()) return FALSE;
+		add_window(self->btn_logout);
+		self->btn_logout->set_background_color(0, 111, 222);
+		self->btn_logout->set_frame(400, 305, 200, 30);
+		self->btn_logout->get_title()->set_text("ÍË³ö");
+		self->btn_logout->get_title()->set_font(&font);
+		self->btn_logout->show();
+		self->btn_logout->set_click(close_click, self);
 
-		self->close = cl_new(CloseButton);
-		if(!self->close->init()) return FALSE;
-		add_window(self->close);
-		self->close->set_background_color(200, 50, 50);
-		self->close->set_frame(700 - 26, 1, 25, 25);
-		self->close->show();
-		self->close->set_click(close_click, this);
+		//self->close = cl_new(CloseButton);
+		//if(!self->close->init()) return FALSE;
+		//add_window(self->close);
+		//self->close->set_background_color(200, 50, 50);
+		//self->close->set_frame(700 - 21, 1, 20, 20);
+		//self->close->show();
+		//self->close->set_click(close_click, NULL);
+ 
+		self->file = CL::File::open_file("info");
+		if(self->file == NULL) return FALSE;
+		 
+		char* str_remember = self->file->read_line();
+		char* str_user = self->file->read_line();
+		char* str_pwd = self->file->read_line();
+		char* str_host = self->file->read_line();
+
+		if(CL::StringUtil::string_compare(str_remember, "true"))
+		{
+			self->remember->set_select(TRUE);
+			self->user->set_text(str_user);
+			self->pwd->set_text(str_pwd);
+			self->host->set_text(str_host);
+		}
+		cl_free(str_user);
+		cl_free(str_pwd);
+		cl_free(str_host);
 
 		show();
 		return TRUE;
 	}
 
-
-
-	void Login::redraw(WL::IRender* render, WL::Rect* r)
+	void Login::redraw(WL::IRender* render)
 	{
-		BaseWindow::redraw(render, r);
+		BaseWindow::redraw(render);
 		render->set_color(186, 186, 186);
 		WL::Rect line;
-		line.set(300, 50, 0.2, 300);
-		render->draw_rect(&line);
+		line.set(300, 50, 1, 300);
+		render->fill_rect(&line);
 	}
 }

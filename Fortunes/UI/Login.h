@@ -12,6 +12,6 @@ namespace Fortunes
 		~Login();
 		st init();
 
-		virtual void redraw(WL::IRender* render, WL::Rect* r);
+		virtual void redraw(WL::IRender* render);
 	};
 }

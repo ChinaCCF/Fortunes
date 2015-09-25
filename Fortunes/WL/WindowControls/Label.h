@@ -23,7 +23,7 @@ namespace WL
 			void set_text_color(const Color* c);
 			void get_text_color(Color* c); 
  
-			virtual void redraw(IRender* render, Rect* r);
+			virtual void redraw(IRender* render);
 		};
 	}
 }

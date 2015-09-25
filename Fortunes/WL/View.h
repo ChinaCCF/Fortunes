@@ -22,7 +22,7 @@ namespace WL
 		virtual void hide() {}
 
 		virtual void update() {}
-		virtual void redraw(const IRender* render, const Rect* r) {}
+		virtual void redraw(const IRender* render) {}
 
 		virtual void add_child(const IView* v) {}
 		virtual void remove_child(const IView* v) {}

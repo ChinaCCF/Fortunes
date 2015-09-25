@@ -39,7 +39,7 @@ namespace WL
 		virtual void show();
 		virtual void hide();
 		virtual void update();
-		virtual void redraw(IRender* render, Rect* r);
+		virtual void redraw(IRender* render);
 
 		virtual void remove_from_parent();
 		virtual st event_for_touch(TouchEvent* e);

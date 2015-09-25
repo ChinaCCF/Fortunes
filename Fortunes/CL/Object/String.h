@@ -15,6 +15,7 @@ namespace CL
 		static char* string_alloc(const char*str);
 #endif
 		static void string_copy(char* buf, st buf_size, const char* str);
+		static st string_compare(const char* str1, const char* str2);
 		static void format(char* buf, st buf_size, const char* format_str, ...);
 
 		static st char_to_wchar_count(const char* str);

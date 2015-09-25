@@ -27,7 +27,7 @@ namespace WL
 			void set_fit(st val);
 			st get_fit();
 
-			virtual void redraw(IRender* render, Rect* r);
+			virtual void redraw(IRender* render);
 		};
 	}
 }

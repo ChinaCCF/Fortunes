@@ -37,7 +37,7 @@ namespace WL
 			else
 			{
 				Color tmp = self->bg;
-				tmp.add_value(+50);
+				tmp.add_value(+30);
 				BaseWindow::set_background_color(&tmp);
 			}
 		}
@@ -48,7 +48,7 @@ namespace WL
 			else
 			{
 				Color tmp = self->bg;
-				tmp.add_value(-50);
+				tmp.add_value(-30);
 				BaseWindow::set_background_color(&tmp);
 			}
 		}
@@ -178,7 +178,7 @@ namespace WL
 			self->title->set_frame(&ir);
 			BaseWindow::set_frame(r);
 		}
-		void Button::set_frame(st x, st y, st w, st h) { self->title->set_frame(0, 0, w, h); BaseWindow::set_frame(x, y, w, h); }
+		void Button::set_frame(ft x, ft y, ft w, ft h) { self->title->set_frame(0, 0, w, h); BaseWindow::set_frame(x, y, w, h); }
 
 	}
 }

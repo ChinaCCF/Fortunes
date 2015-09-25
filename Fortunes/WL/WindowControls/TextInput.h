@@ -6,6 +6,10 @@ namespace WL
 	namespace SubWindow
 	{
 		class _TextInput;
+		class TextInput;
+
+		typedef st(*TextInputFilter)(TextInput* input, WL::KeyBoardEvent* e, void* extra);
+
 		class TextInput :public BaseWindow
 		{
 			_TextInput* self;
@@ -28,6 +32,7 @@ namespace WL
 
 			virtual void set_focus();
 
+			void set_filter(TextInputFilter filter, void* extra);
 			virtual st event_for_keyboard(WL::KeyBoardEvent* e);
 		};
 	}

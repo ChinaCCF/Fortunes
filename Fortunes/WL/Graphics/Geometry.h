@@ -88,6 +88,13 @@ namespace WL
 			w -= 2 * val;
 			h -= 2 * val;
 		}
+		void expand(st val)
+		{
+			x -= val;
+			y -= val;
+			w += 2 * val;
+			h += 2 * val;
+		}
 		/**************************************************/
 		st is_intersect_with(const Rect* rect)
 		{

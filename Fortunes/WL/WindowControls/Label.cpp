@@ -55,7 +55,7 @@ namespace WL
 		}
 		void Label::get_text_color(Color* c) { *c = self->color; }
 
-		void Label::redraw(IRender* render, Rect* r)
+		void Label::redraw(IRender* render)
 		{
 			if(self->text && (self->text) > 0)
 			{
@@ -68,23 +68,28 @@ namespace WL
 				Rect target;
 				target.set(0, 0, size.w, size.h);
 
+				WL::Rect r;
+				get_frame(&r);
+				r.x = 0;
+				r.y = 0;
+
 				st align = get_horizontal_align();
 				if(align == 0)
-					target.move_to_horizontal_center_in(r);
+					target.move_to_horizontal_center_in(&r);
 				else
 				{
 					if(align == 1)
-						target.move_to_right_in(r);
+						target.move_to_right_in(&r);
 				}
 
 				align = get_vertical_align();
 
 				if(align == 0)
-					target.move_to_vertical_center_in(r);
+					target.move_to_vertical_center_in(&r);
 				else
 				{
 					if(align == 1)
-						target.move_to_bottom_in(r);
+						target.move_to_bottom_in(&r);
 				}
 				target.y += target.h * 0.1;
 				render->draw_text(&target, self->text);

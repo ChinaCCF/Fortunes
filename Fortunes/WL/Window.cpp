@@ -13,7 +13,6 @@ namespace WL
 	public:
 		Window32* win32;
 		Color background;
-		st need_redraw_bg;
 		BaseWindow* parent;
 		st horizontal;
 		st vertical;
@@ -32,7 +31,6 @@ namespace WL
 		if(self->win32 == NULL) return FALSE;
 		if(!self->win32->init(class_name, style)) return FALSE;
 		self->win32->set_dispatcher(this);
-		self->need_redraw_bg = TRUE;
 		return TRUE;
 	}
 
@@ -45,7 +43,6 @@ namespace WL
 		if(self->background != *c)
 		{
 			self->background = *c;
-			self->need_redraw_bg = TRUE;
 			update();
 		}
 	}
@@ -54,7 +51,6 @@ namespace WL
 		if(self->background != Color(r, g, b))
 		{
 			self->background.set(r, g, b);
-			self->need_redraw_bg = TRUE;
 			update();
 		}
 	}
@@ -74,21 +70,14 @@ namespace WL
 	void BaseWindow::hide() { self->win32->hide(); }
 	void BaseWindow::update() { self->win32->update(); }
 
-	void BaseWindow::redraw(IRender* render, Rect* r)
+	void BaseWindow::redraw(IRender* render)
 	{
-		if(self->need_redraw_bg)
-		{
-			self->need_redraw_bg = FALSE;
-			Rect sr;
-			self->win32->get_frame(&sr);
-			render->set_color(&self->background);
-			sr.x = 0;
-			sr.y = 0;
-			if(*r == sr)
-				render->fill_rect(-2, -2, sr.w + 4, sr.h + 4);
-			else
-				render->fill_rect(r);
-		}
+		render->set_color(&self->background);
+		Rect r;
+		get_frame(&r);
+		r.x = 0;
+		r.y = 0;
+		render->fill_rect(-2, -2, r.w + 4, r.h + 4);
 	}
 	void BaseWindow::remove_from_parent() { if(self->parent) self->parent->remove_window(this); }
 

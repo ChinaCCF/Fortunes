@@ -53,6 +53,46 @@ namespace CL
 		T* operator->() { return p_; }
 		T& operator*() { return *p_; }
 	};
-#define cl_auto(T, var) CL::Auto<T> var(cl_new(T))
+#define cl_auto_new(T, var) CL::Auto<T> var(cl_new(T))
+
+#if CL_IS_DEBUG
+	template<typename T>
+	T* _cl_alloc_init(st size, const char* file, st line)
+	{
+		T* obj = (T*)CL::MemoryUtil::_alloc(size, file, line);
+		if(obj)
+		{
+			if(obj->init())
+				return obj;
+			else
+			{
+			cl_free(obj);
+				return NULL;
+			}
+		}
+		return NULL;
+	}
+#define cl_alloc_init(T) _cl_alloc_init<T>(sizeof(T), __FILE__, __LINE__)
+#else
+	template<typename T>
+	T* _cl_alloc_init(st size)
+	{
+		T* obj = cl_alloc(size);
+		if(obj)
+		{
+			if(obj->init())
+				return obj;
+			else
+			{
+				cl_free(obj);
+				return NULL;
+			}
+		}
+		return NULL;
+	}
+#define cl_alloc_init(T) _cl_alloc_init<T>(sizeof(T))
+#endif
+#define cl_uninit_free(p) do{if(p){p->uninit(); cl_free(p);}}while(0)
+
 }
 #endif

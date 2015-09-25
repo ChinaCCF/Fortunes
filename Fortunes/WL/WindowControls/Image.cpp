@@ -44,38 +44,43 @@ namespace WL
 		void Image::set_fit(st val) { self->fit = val; }
 		st Image::get_fit() { return self->fit; }
 
-		void Image::redraw(IRender* render, Rect* r) {
+		void Image::redraw(IRender* render) {
 			if(self->image->get_image() == NULL) return;
 			Rect target;
 			target.w = self->image->get_width();
 			target.h = self->image->get_height();
 			if(self->scale)
 			{
+				Rect r;
+				get_frame(&r);
+				r.x = 0;
+				r.y = 0;
+
 				if(self->fit)
 				{
-					target.fit_in(r);
+					target.fit_in(&r);
 					 
 					st align = get_horizontal_align();
 					if(align == 0)
-						target.move_to_horizontal_center_in(r);
+						target.move_to_horizontal_center_in(&r);
 					else
 					{
 						if(align == 1)
-							target.move_to_right_in(r);
+							target.move_to_right_in(&r);
 					}
 					align = get_vertical_align();
 					if(align == 0)
-						target.move_to_vertical_center_in(r);
+						target.move_to_vertical_center_in(&r);
 					else
 					{
 						if(align == 1)
-							target.move_to_bottom_in(r);
+							target.move_to_bottom_in(&r);
 					}
 				}
 				else
 				{
-					target.w = r->w;
-					target.h = r->h;
+					target.w = r.w;
+					target.h = r.h;
 				}
 			}
 			render->draw_image(self->image, &target);
