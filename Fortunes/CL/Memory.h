@@ -4,7 +4,7 @@
 #ifndef __CL_Memory__
 #define __CL_Memory__
 
-namespace CL
+namespace cl
 {
 	class MemoryUtil
 	{
@@ -22,13 +22,13 @@ namespace CL
 	};
 
 #if CL_IS_DEBUG
-#define cl_alloc(x)         CL::MemoryUtil::_alloc(x, __FILE__, __LINE__)
-#define cl_realloc(p, s)    CL::MemoryUtil::_realloc(p, s, __FILE__, __LINE__)
-#define cl_free(p)          do{if(p)CL::MemoryUtil::_free(p);}while(0)
+#define cl_alloc(x)         cl::MemoryUtil::_alloc(x, __FILE__, __LINE__)
+#define cl_realloc(p, s)    cl::MemoryUtil::_realloc(p, s, __FILE__, __LINE__)
+#define cl_free(p)          do{if(p)cl::MemoryUtil::_free(p);}while(0)
 #else
-#define cl_alloc(x)         CL::MemoryUtil::alloc(x)
-#define cl_realloc(p, s)    CL::MemoryUtil::realloc(p, s)
-#define cl_free(p)          do{if(p)CL::MemoryUtil::free(p);}while(0)
+#define cl_alloc(x)         cl::MemoryUtil::alloc(x)
+#define cl_realloc(p, s)    cl::MemoryUtil::realloc(p, s)
+#define cl_free(p)          do{if(p)cl::MemoryUtil::free(p);}while(0)
 #endif
 
 #define cl_alloc_type(T)                ((T*)cl_alloc(sizeof(T)))
@@ -37,7 +37,7 @@ namespace CL
 #define cl_new(T)                       (new(cl_alloc_type(T)) T)
 
 #if CL_IS_DEBUG
-#define cl_delete(p)                    do{if(p){CL::MemoryUtil::unmark(p); delete p;}}while(0)
+#define cl_delete(p)                    do{if(p){cl::MemoryUtil::unmark(p); delete p;}}while(0)
 #else
 #define cl_delete(p)                    do{if(p)delete p;}while(0)
 #endif
@@ -53,13 +53,13 @@ namespace CL
 		T* operator->() { return p_; }
 		T& operator*() { return *p_; }
 	};
-#define cl_auto_new(T, var) CL::Auto<T> var(cl_new(T))
+#define cl_auto_new(T, var) cl::Auto<T> var(cl_new(T))
 
 #if CL_IS_DEBUG
 	template<typename T>
 	T* _cl_alloc_init(st size, const char* file, st line)
 	{
-		T* obj = (T*)CL::MemoryUtil::_alloc(size, file, line);
+		T* obj = (T*)cl::MemoryUtil::_alloc(size, file, line);
 		if(obj)
 		{
 			if(obj->init())

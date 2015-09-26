@@ -110,7 +110,7 @@ namespace WL
 				style = Gdiplus::FontStyle::FontStyleRegular;
 
 			wchar font_name[32];
-			CL::StringUtil::char_to_wchar(f->get_name(), font_name, 32);
+			cl::StringUtil::char_to_wchar(font_name, 32, f->get_name());
 			Gdiplus::Font* tmp = new Gdiplus::Font(font_name, (Gdiplus::REAL)f->get_size(), style);
 			if(tmp) { delete font; font = tmp; }
 		}
@@ -131,10 +131,10 @@ namespace WL
 			size->w = 0;
 			size->h = 0;
 
-			st count = CL::StringUtil::char_to_wchar_count(str);
+			st count = cl::StringUtil::char_to_wchar_count(str);
 			wchar* wstr = cl_alloc_type_with_count(wchar, count);
 			if(wstr == NULL) return;
-			CL::StringUtil::char_to_wchar(str, wstr, count);
+			cl::StringUtil::char_to_wchar(wstr, count, str);
 
 			Gdiplus::RectF limit(0, 0, 9999, 9999);
 			Gdiplus::RectF result;
@@ -147,10 +147,10 @@ namespace WL
 			Gdiplus::SolidBrush* brush = new Gdiplus::SolidBrush(*color);
 			if(brush == NULL) return;
 
-			st count = CL::StringUtil::char_to_wchar_count(str);
+			st count = cl::StringUtil::char_to_wchar_count(str);
 			wchar* wstr = cl_alloc_type_with_count(wchar, count);
 			if(wstr == NULL) { delete brush;  return; }
-			CL::StringUtil::char_to_wchar(str, wstr, count);
+			cl::StringUtil::char_to_wchar(wstr, count, str);
 
 			Gdiplus::Region old_val;
 			graphics->GetClip(&old_val);

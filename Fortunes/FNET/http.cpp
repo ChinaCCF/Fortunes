@@ -105,7 +105,7 @@ int urlRequest(const wchar_t* url,
 	ret = WinHttpSendRequest(req, NULL, 0, NULL, 0, len, 0);
 	if(!ret)
 		goto Label_End;
-	 
+
 	while(len)
 	{
 		ret = WinHttpWriteData(req, content, len, &cnt);
@@ -122,7 +122,7 @@ int urlRequest(const wchar_t* url,
 	cnt = sizeof(DWORD);
 	ret = WinHttpQueryHeaders(req, WINHTTP_QUERY_STATUS_CODE | WINHTTP_QUERY_FLAG_NUMBER, NULL, code, &cnt, NULL);
 	if(!ret)
-		goto Label_End; 
+		goto Label_End;
 
 	*rep_len = 0;
 	do
@@ -154,7 +154,7 @@ int urlRequest(const wchar_t* url,
 		*rep_len = buf_size - 1;
 		continue;
 
-	Label_Err:
+Label_Err:
 		if(*rep)
 		{
 			free(*rep);
@@ -175,6 +175,6 @@ Label_End:
 		WinHttpCloseHandle(connect);
 
 	if(req)
-		WinHttpCloseHandle(req); 
+		WinHttpCloseHandle(req);
 	return (int)ret;
 }

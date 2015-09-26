@@ -6,19 +6,29 @@
 #endif
 #include <CL/Memory.h>
 
-namespace CL
+namespace cl
 {
 	void StringUtil::string_copy(char* buf, st buf_size, const char* str)
 	{
 		st len = strlen(str);
 		if(len >= buf_size) len = buf_size - 1;
-		memcpy(buf, str, len + 1);
+		memcpy(buf, str, len);
+		buf[len] = 0;
+	}
+	void StringUtil::string_append(char* buf, st buf_size, const char* str)
+	{
+		st buf_str_len = strlen(buf);
+		st str_len = strlen(str);
+		st len = buf_size - buf_str_len - 1;
+		if(len > str_len) len = str_len;
+		memcpy(buf + buf_str_len, str, len);
+		buf[buf_str_len + len] = 0;
 	}
 #if CL_IS_DEBUG
 	char* StringUtil::string_alloc(const char* str, const char* file, st line)
 	{
 		st len = strlen(str) + 1;
-		char* buf = (char*)CL::MemoryUtil::_alloc(len, file, line);
+		char* buf = (char*)cl::MemoryUtil::_alloc(len, file, line);
 		if(buf == NULL) return buf;
 		memcpy(buf, str, len);
 		return buf;
@@ -27,7 +37,7 @@ namespace CL
 	char* StringUtil::string_alloc(const char* str)
 	{
 		st len = strlen(str) + 1;
-		char* buf = (char*)CL::MemoryUtil::alloc(len);
+		char* buf = (char*)cl::MemoryUtil::alloc(len);
 		if(buf == NULL) return buf;
 		memcpy(buf, str, len);
 		return buf;
@@ -38,7 +48,7 @@ namespace CL
 	{
 		return strcmp(str1, str2) == 0;
 	}
-	void StringUtil::format(char* buf, st buf_size, const char* format_str, ...)
+	void StringUtil::string_format(char* buf, st buf_size, const char* format_str, ...)
 	{
 		va_list list;
 		va_start(list, format_str);
@@ -59,18 +69,18 @@ namespace CL
 		return WideCharToMultiByte(CP_ACP, 0, str, -1, NULL, 0, NULL, NULL);
 	}
 
-	st StringUtil::char_to_wchar(const char* str, wchar* buf, st buf_count)
+	st StringUtil::char_to_wchar(wchar* buf, st buf_count, const char* str)
 	{
 		st count = char_to_wchar_count(str);
 		if(count > buf_count) return FALSE;
 		MultiByteToWideChar(CP_ACP, 0, str, -1, buf, buf_count);
 		return TRUE;
 	}
-	st StringUtil::wchar_to_char(const wchar* str, char* buf, st buf_count)
+	st StringUtil::wchar_to_char(char* buf, st buf_count, const wchar* str)
 	{
 		st count = wchar_to_char_count(str);
 		if(count > buf_count) return FALSE;
 		WideCharToMultiByte(CP_ACP, 0, str, -1, buf, buf_count, NULL, NULL);
 		return TRUE;
 	}
-}
+	}

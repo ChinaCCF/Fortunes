@@ -82,6 +82,7 @@
     <ClInclude Include="CL\Object\String.h" />
     <ClInclude Include="FNET\cJSON.h" />
     <ClInclude Include="FNET\http.h" />
+    <ClInclude Include="FNET\Model.h" />
     <ClInclude Include="Resource\Resource.h" />
     <ClInclude Include="UI\Common.h" />
     <ClInclude Include="UI\Login.h" />
@@ -96,6 +97,7 @@
     <ClInclude Include="WL\WindowControls\Button.h" />
     <ClInclude Include="WL\WindowControls\Image.h" />
     <ClInclude Include="WL\WindowControls\Label.h" />
+    <ClInclude Include="WL\WindowControls\ScrollView.h" />
     <ClInclude Include="WL\WindowControls\TextInput.h" />
   </ItemGroup>
   <ItemGroup>
@@ -105,6 +107,7 @@
     <ClCompile Include="CL\Object\String.cpp" />
     <ClCompile Include="FNET\cJSON.cpp" />
     <ClCompile Include="FNET\http.cpp" />
+    <ClCompile Include="FNET\Model.cpp" />
     <ClCompile Include="Fortunes.cpp" />
     <ClCompile Include="UI\Common.cpp" />
     <ClCompile Include="UI\Login.cpp" />
@@ -117,6 +120,7 @@
     <ClCompile Include="WL\WindowControls\Button.cpp" />
     <ClCompile Include="WL\WindowControls\Image.cpp" />
     <ClCompile Include="WL\WindowControls\Label.cpp" />
+    <ClCompile Include="WL\WindowControls\ScrollView.cpp" />
     <ClCompile Include="WL\WindowControls\TextInput.cpp" />
   </ItemGroup>
   <ItemGroup>

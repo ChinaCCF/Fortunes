@@ -1,7 +1,7 @@
 #include <CL/Memory.h>
 #include <stdlib.h>
 
-namespace CL
+namespace cl
 {
 	void* MemoryUtil::alloc(st size)
 	{

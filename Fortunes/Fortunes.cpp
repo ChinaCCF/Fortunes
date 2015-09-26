@@ -21,14 +21,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 	Fortunes::Login* login = cl_new(Fortunes::Login);
 	login->init();
 	WL::Window32::loop();
-	cl_delete(login);
-
-	/*Fortunes::Main* main = cl_new(Fortunes::Main);
-	main->init();
-	WL::Window32::loop();
-	cl_delete(main);*/
-
-	CL::MemoryUtil::check();
+	cl::MemoryUtil::check();
 	return 0;
 }
 

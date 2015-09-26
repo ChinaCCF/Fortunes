@@ -7,9 +7,12 @@
 #include <WL/Graphics/Render.h>
 #include <UI/Common.h>
 #include <CL/IO/File.h>
+#include <FNET/Model.h>
+#include <UI/Main.h>
 
 namespace Fortunes
 {
+	static st g_is_loging = 0;
 	static st text_filter(WL::SubWindow::TextInput* txt, WL::KeyBoardEvent* e, void* extra);
 
 	class Input :public WL::BaseWindow
@@ -108,10 +111,10 @@ namespace Fortunes
 		WL::SubWindow::Label* lbl;
 		WL::SubWindow::Button* btn_login;
 		WL::SubWindow::Button* btn_logout;
-
+		WL::SubWindow::Label* err;
 		CloseButton* close;
-		CL::File* file;
-		
+		cl::File* file;
+		Login* self;
 		_Login()
 		{
 			img = NULL;
@@ -124,6 +127,8 @@ namespace Fortunes
 			pwd = NULL;
 			user = NULL;
 			file = NULL;
+			err = NULL;
+			self = NULL;
 		}
 	};
 	Login::~Login()
@@ -139,19 +144,37 @@ namespace Fortunes
 			cl_delete(self->btn_login);
 			cl_delete(self->close);
 			cl_delete(self->btn_logout);
-			CL::File::close_file(self->file);
+			cl_delete(self->err);
+			cl::File::close_file(self->file);
 		}
 		cl_delete(self);
 	}
 	static void login_click(WL::SubWindow::BaseButton* btn, void* extra)
-	{
-		cl_printf("login\n");
+	{ 
+		_Login* self = (_Login*)extra;
+		g_is_loging = TRUE;
+		st ret = NetUtil::login(self->host->input->get_text(), self->user->input->get_text(), self->pwd->input->get_text());
+		g_is_loging = FALSE;
+		if(ret)
+		{
+			self->err->hide();
+			Fortunes::Main* main = cl_new(Fortunes::Main);
+			main->init();
+			cl_delete(self->self);
+		}
+		else
+		{
+			self->err->show();
+		}
 	}
 
 	static void remember_click(WL::SubWindow::BaseButton* btn, void* extra)
 	{
-		SelectBtn* sel = (SelectBtn*)btn;
-		sel->set_select(!sel->get_select());
+		if(!g_is_loging)
+		{
+			SelectBtn* sel = (SelectBtn*)btn;
+			sel->set_select(!sel->get_select());
+		}
 	}
 	static void close_click(WL::SubWindow::BaseButton* btn, void* extra)
 	{
@@ -159,6 +182,7 @@ namespace Fortunes
 	}
 	static st text_filter(WL::SubWindow::TextInput* txt, WL::KeyBoardEvent* e, void* extra)
 	{ 
+		if(g_is_loging) return TRUE;
 		_Login* l = (_Login*)extra;
 		if(e->get_char() == '\t')
 		{
@@ -187,6 +211,7 @@ namespace Fortunes
 		if(!WL::Window::init()) return FALSE;
 		self = cl_new(_Login);
 		if(self == NULL) return FALSE;
+		self->self = this;
 
 		set_background_color(239, 236, 255);
 		set_frame(0, 0, 700, 400);
@@ -217,15 +242,17 @@ namespace Fortunes
 		self->host->set_frame(400, 180, 200, 27);
 		self->host->show();
 
-		self->lbl = cl_new(WL::SubWindow::Label);
-		if(!self->lbl->init()) return FALSE;
-		add_window(self->lbl);
-		WL::Color c;
-		c.set(0, 0, 0);
-		self->lbl->set_text_color(&c);
 		WL::Font f;
 		f.init();
 		f.set_size(10);
+
+		WL::Color c;
+		c.set(0, 0, 0);
+
+		self->lbl = cl_new(WL::SubWindow::Label);
+		if(!self->lbl->init()) return FALSE;
+		add_window(self->lbl);
+		self->lbl->set_text_color(&c);
 		self->lbl->set_font(&f);
 		self->lbl->set_text("¼Ç×¡ÃÜÂë");
 		self->lbl->set_frame(600 - 60, 222, 60, 27);
@@ -254,7 +281,7 @@ namespace Fortunes
 		self->btn_login->show();
 		self->btn_login->set_click(login_click, self);
 
-		self->btn_logout = cl_new(WL::SubWindow::Button);
+		/*self->btn_logout = cl_new(WL::SubWindow::Button);
 		if(!self->btn_logout->init()) return FALSE;
 		add_window(self->btn_logout);
 		self->btn_logout->set_background_color(0, 111, 222);
@@ -262,17 +289,28 @@ namespace Fortunes
 		self->btn_logout->get_title()->set_text("ÍË³ö");
 		self->btn_logout->get_title()->set_font(&font);
 		self->btn_logout->show();
-		self->btn_logout->set_click(close_click, self);
+		self->btn_logout->set_click(close_click, self);*/
 
-		//self->close = cl_new(CloseButton);
-		//if(!self->close->init()) return FALSE;
-		//add_window(self->close);
-		//self->close->set_background_color(200, 50, 50);
-		//self->close->set_frame(700 - 21, 1, 20, 20);
-		//self->close->show();
-		//self->close->set_click(close_click, NULL);
- 
-		self->file = CL::File::open_file("info");
+		self->close = cl_new(CloseButton);
+		if(!self->close->init()) return FALSE;
+		add_window(self->close);
+		self->close->set_background_color(200, 50, 50);
+		self->close->set_frame(700 - 21, 1, 20, 20);
+		self->close->show();
+		self->close->set_click(close_click, NULL);
+
+		c.set(255,0,0);
+		self->err = cl_new(WL::SubWindow::Label);
+		if(!self->err->init()) return FALSE;
+		add_window(self->err);
+		self->err->set_text_color(&c);
+		self->err->set_font(&f);
+		self->err->set_text("µÇÂ¼Ê§°Ü");
+		self->err->set_frame(600 - 60, 350, 60, 27);
+		self->err->set_horizontal_align(1);
+		//self->err->show();
+
+		self->file = cl::File::open_file("info");
 		if(self->file == NULL) return FALSE;
 		 
 		char* str_remember = self->file->read_line();
@@ -280,7 +318,7 @@ namespace Fortunes
 		char* str_pwd = self->file->read_line();
 		char* str_host = self->file->read_line();
 
-		if(CL::StringUtil::string_compare(str_remember, "true"))
+		if(cl::StringUtil::string_compare(str_remember, "true"))
 		{
 			self->remember->set_select(TRUE);
 			self->user->set_text(str_user);
@@ -290,6 +328,7 @@ namespace Fortunes
 		cl_free(str_user);
 		cl_free(str_pwd);
 		cl_free(str_host);
+		cl_free(str_remember);
 
 		show();
 		return TRUE;

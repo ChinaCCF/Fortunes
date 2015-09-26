@@ -3,7 +3,7 @@
 #ifndef __CL_Object_Array__
 #define __CL_Object_Array__
 
-namespace CL
+namespace cl
 {
 	template<typename T>
 	class Array :public virtual Object

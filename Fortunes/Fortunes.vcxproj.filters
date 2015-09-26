@@ -81,6 +81,12 @@
     <ClInclude Include="FNET\http.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="FNET\Model.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="WL\WindowControls\ScrollView.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Fortunes.cpp">
@@ -138,6 +144,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="FNET\http.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="FNET\Model.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="WL\WindowControls\ScrollView.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

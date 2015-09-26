@@ -4,7 +4,7 @@
 #ifndef __CL_Object_String__
 #define __CL_Object_String__
 
-namespace CL
+namespace cl
 {
 	class StringUtil
 	{
@@ -16,13 +16,14 @@ namespace CL
 #endif
 		static void string_copy(char* buf, st buf_size, const char* str);
 		static st string_compare(const char* str1, const char* str2);
-		static void format(char* buf, st buf_size, const char* format_str, ...);
+		static void string_append(char* buf, st buf_size, const char* str);
+		static void string_format(char* buf, st buf_size, const char* format_str, ...);
 
 		static st char_to_wchar_count(const char* str);
 		static st wchar_to_char_count(const wchar* str);
 
-		static st char_to_wchar(const char* str, wchar* buf, st buf_count);
-		static st wchar_to_char(const wchar* str, char* buf, st buf_count);
+		static st char_to_wchar(wchar* buf, st buf_count, const char* str);
+		static st wchar_to_char(char* buf, st buf_count, const wchar* str);
 
 		//static st char_to_utf8_count(const char* str);
 		//static st utf8_to_char_count(const char* str);
@@ -38,9 +39,9 @@ namespace CL
 	};
 
 #if CL_IS_DEBUG
-#define cl_string_alloc(x) CL::StringUtil::string_alloc(x, __FILE__, __LINE__)
+#define cl_string_alloc(x) cl::StringUtil::string_alloc(x, __FILE__, __LINE__)
 #else
-#define cl_string_alloc(x) CL::StringUtil::string_alloc(x)
+#define cl_string_alloc(x) cl::StringUtil::string_alloc(x)
 #endif
 
 	/*class String : public virtual Object

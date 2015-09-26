@@ -71,7 +71,7 @@ namespace WL
 
 	static HWND create_window(const char* class_name, st style)
 	{
-		DWORD flags = WS_POPUP ;
+		DWORD flags = WS_POPUP;
 		DWORD ex_flags = WS_EX_ACCEPTFILES | WS_EX_APPWINDOW | WS_EX_NOPARENTNOTIFY | WS_EX_TRANSPARENT;
 		if(style) flags |= style;
 		return CreateWindowExA(ex_flags, class_name, ""/*title*/, flags, 0, 0, 1, 1, NULL/*parent*/, NULL/*menu*/, g_application_instance, NULL/*extra*/);
@@ -162,7 +162,7 @@ namespace WL
 			if(abs(self->alpha - val) > 0.01)
 			{
 				self->alpha = val;
-				self->alpha = CL::MAX(0.0, CL::MIN(1.0, self->alpha));
+				self->alpha = cl::MAX(0.0, cl::MIN(1.0, self->alpha));
 				SetLayeredWindowAttributes(self->hwnd, NULL, (BYTE)(self->alpha * 254), LWA_ALPHA);
 			}
 		}
@@ -190,7 +190,7 @@ namespace WL
 
 				self->frame.move_to_center_in(&screen);
 			}
-			 
+
 			MoveWindow(self->hwnd, (st)self->frame.x, (st)self->frame.y, (st)self->frame.w, (st)self->frame.h, FALSE);
 			self->has_show = TRUE;
 			update();
@@ -253,6 +253,17 @@ namespace WL
 		win->frame.x = r.left;
 		win->frame.y = r.top;
 	}
+
+	static st wheel(_Window32* win, WPARAM w)
+	{
+		if(win->dispatcher)
+		{
+			st direction = HIWORD(w);
+			win->dispatcher->event_for_wheel(direction);
+			return TRUE;
+		}
+		return FALSE;
+	}
 	static LRESULT CALLBACK Window_Process(HWND hWnd, UINT message, WPARAM w, LPARAM l)
 	{
 		if(message == WM_NCCREATE)
@@ -261,53 +272,62 @@ namespace WL
 		_Window32* win = (_Window32*)GetWindowLongPtrA(hWnd, GWLP_USERDATA);
 		if(win)
 		{
-			if(message == WM_PAINT) { if(paint(win, w, l)) return 0; }
-			else
+			switch(message)
 			{
-				if(message == WM_LBUTTONDOWN) { if(touch_event(win, WL::TouchEvent::Down, l)) return 0; }
-				else
-				{
-					if(message == WM_LBUTTONUP) { if(touch_event(win, WL::TouchEvent::Up, l)) return 0; }
-					else
-					{
-						if(message == WM_MOUSEMOVE)
-						{
-							if(!win->is_mouse_track)
-							{
-								TRACKMOUSEEVENT track = {0};
-								track.cbSize = sizeof(TRACKMOUSEEVENT);
-								track.dwFlags = TME_LEAVE | TME_HOVER;
-								track.hwndTrack = hWnd;
-								track.dwHoverTime = 10;
-								TrackMouseEvent(&track);
-								win->is_mouse_track = TRUE;
-							}
-							if(touch_event(win, WL::TouchEvent::Move, l))
-								return 0;
-						}
-						else
-						{
-							if(message == WM_MOUSEHOVER) { if(touch_event(win, WL::TouchEvent::Enter, l)) return 0; }
-							else
-							{
-								if(message == WM_MOUSELEAVE)
-								{
-									win->is_mouse_track = FALSE;
-									if(touch_event(win, WL::TouchEvent::Leave, l))
-										return 0;
-								}
-								else
-								{
-									if(message == WM_EXITSIZEMOVE) { update_frame(win); return 0; }
-									else
-									{
-										//if(message == )
-									}
-								}
-							}
-						}
+				case WM_PAINT:{
+						if(paint(win, w, l))
+							return 0;
+						break;
 					}
-				}
+				case WM_LBUTTONDOWN: {
+						if(touch_event(win, WL::TouchEvent::Down, l))
+							return 0;
+						break;
+					}
+				case WM_LBUTTONUP: {
+						if(touch_event(win, WL::TouchEvent::Up, l))
+							return 0;
+						break;
+					}
+				case WM_MOUSEMOVE:
+					{
+						if(!win->is_mouse_track)
+						{
+							TRACKMOUSEEVENT track = {0};
+							track.cbSize = sizeof(TRACKMOUSEEVENT);
+							track.dwFlags = TME_LEAVE | TME_HOVER;
+							track.hwndTrack = hWnd;
+							track.dwHoverTime = 10;
+							TrackMouseEvent(&track);
+							win->is_mouse_track = TRUE;
+						}
+						if(touch_event(win, WL::TouchEvent::Move, l))
+							return 0;
+						break;
+					}
+				case WM_MOUSEHOVER: {
+						if(touch_event(win, WL::TouchEvent::Enter, l))
+							return 0;
+						break;
+					}
+				case WM_MOUSELEAVE:
+					{
+						win->is_mouse_track = FALSE;
+						if(touch_event(win, WL::TouchEvent::Leave, l))
+							return 0;
+						break;
+					}
+				case WM_EXITSIZEMOVE: {
+						update_frame(win);
+						return 0;
+					}
+				case WM_MOUSEWHEEL:{
+						if(wheel(win, w))
+							return 0;
+						break;
+					}
+				default:
+					break;
 			}
 		}
 		return DefWindowProc(hWnd, message, w, l);
@@ -322,7 +342,7 @@ namespace WL
 				{
 					WL::KeyBoardEvent e;
 					e.init(WL::KeyBoardEvent::Char, wParam);
-					if(win->dispatcher->event_for_keyboard(&e)) return 0; 
+					if(win->dispatcher->event_for_keyboard(&e)) return 0;
 				}
 			default:
 				return win->ctrl_proc(hWnd, message, wParam, lParam);

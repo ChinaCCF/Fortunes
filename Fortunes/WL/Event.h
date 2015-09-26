@@ -89,6 +89,7 @@ namespace WL
 	public:
 		virtual st event_for_keyboard(KeyBoardEvent* e) { return FALSE; }
 		virtual st event_for_touch(TouchEvent* e) { return FALSE; }
+		virtual st event_for_wheel(st direction) { return FALSE; }
 		virtual st test_point(Point* p) { return FALSE; }
 	};
 }

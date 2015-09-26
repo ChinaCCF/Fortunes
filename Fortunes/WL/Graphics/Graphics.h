@@ -28,9 +28,9 @@ namespace WL
 			blue += val;
 			green += val;
 
-			red = CL::MAX(CL::MIN(255, red), 0);
-			green = CL::MAX(CL::MIN(255, green), 0);
-			blue = CL::MAX(CL::MIN(255, blue), 0);
+			red = cl::MAX(cl::MIN(255, red), 0);
+			green = cl::MAX(cl::MIN(255, green), 0);
+			blue = cl::MAX(cl::MIN(255, blue), 0);
 		}
 		st operator==(const Color& c)
 		{

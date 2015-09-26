@@ -6,7 +6,7 @@
 #include <Windows.h>
 #endif
 
-namespace CL
+namespace cl
 {
 	void Logger::printf(const char *file, st line, const char *message)
 	{

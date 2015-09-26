@@ -86,7 +86,7 @@ typedef f64 ft;
 #define TRUE 1
 #endif
 
-namespace CL
+namespace cl
 {
 	template <typename T> inline T MAX(T a, T b) { return a > b ? a : b; }
 	template <typename T> inline T MIN(T a, T b) { return a > b ? b : a; }
@@ -97,7 +97,7 @@ namespace CL
 	public:
 		static void printf(const char* file, st line, const char* message);
 	};
-#define cl_printf(msg) CL::Logger::printf(__FILE__, __LINE__, msg)
+#define cl_printf(msg) cl::Logger::printf(__FILE__, __LINE__, msg)
 
 }
 #endif

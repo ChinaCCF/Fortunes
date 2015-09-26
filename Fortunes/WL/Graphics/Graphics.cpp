@@ -147,9 +147,9 @@ namespace WL
 
 		if(self->file)
 		{
-			st count = CL::StringUtil::char_to_wchar_count(self->file);
+			st count = cl::StringUtil::char_to_wchar_count(self->file);
 			wchar* file = cl_alloc_type_with_count(wchar, count);
-			CL::StringUtil::char_to_wchar(self->file, file, count);
+			cl::StringUtil::char_to_wchar(file, count, self->file);
 			self->image = new Gdiplus::Image(file);
 			cl_free(file);
 			return self->image;

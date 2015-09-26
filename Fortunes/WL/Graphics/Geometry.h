@@ -109,13 +109,13 @@ namespace WL
 			Rect r;
 			if(is_intersect_with(rect))
 			{
-				r.x = CL::MAX(rect->x, x);
-				r.y = CL::MAX(rect->y, y);
+				r.x = cl::MAX(rect->x, x);
+				r.y = cl::MAX(rect->y, y);
 
-				ft right = CL::MIN(rect->x + rect->w, x + w);
+				ft right = cl::MIN(rect->x + rect->w, x + w);
 				r.w = right - r.x;
 
-				ft bottom = CL::MIN(rect->y + rect->h, y + h);
+				ft bottom = cl::MIN(rect->y + rect->h, y + h);
 				r.h = bottom - r.y;
 			}
 			return r;
@@ -125,10 +125,10 @@ namespace WL
 			Rect r;
 			if(rect->w != 0 && rect->h != 0 && w != 0 && h != 0)
 			{
-				r.x = CL::MIN(x, rect->x);
-				r.y = CL::MIN(y, rect->y);
-				r.w = CL::MAX(x + w, rect->x + rect->w) - r.x;
-				r.h = CL::MAX(y + h, rect->y + rect->h) - r.y;
+				r.x = cl::MIN(x, rect->x);
+				r.y = cl::MIN(y, rect->y);
+				r.w = cl::MAX(x + w, rect->x + rect->w) - r.x;
+				r.h = cl::MAX(y + h, rect->y + rect->h) - r.y;
 			}
 			return r;
 		}
