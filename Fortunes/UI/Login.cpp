@@ -318,7 +318,7 @@ namespace Fortunes
 		char* str_pwd = self->file->read_line();
 		char* str_host = self->file->read_line();
 
-		if(cl::StringUtil::string_compare(str_remember, "true"))
+		if(cl::StringUtil::compare(str_remember, "true"))
 		{
 			self->remember->set_select(TRUE);
 			self->user->set_text(str_user);

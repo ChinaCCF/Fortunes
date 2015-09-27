@@ -92,12 +92,11 @@ namespace cl
 	template <typename T> inline T MIN(T a, T b) { return a > b ? b : a; }
 	template <typename T> inline T DIF(T a, T b) { if(a > b) return a - b; else return b - a; }
 
-	class Logger
+	class LoggerUtil
 	{
 	public:
 		static void printf(const char* file, st line, const char* message);
 	};
-#define cl_printf(msg) cl::Logger::printf(__FILE__, __LINE__, msg)
-
+#define cl_printf(msg) cl::LoggerUtil::printf(__FILE__, __LINE__, msg)
 }
 #endif

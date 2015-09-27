@@ -16,7 +16,7 @@ namespace Fortunes
 		char buf[128];
 		wchar url[128];
 
-		cl::StringUtil::string_format(buf, 128, "http://%s/v2/logon", g_host);
+		cl::StringUtil::format(buf, 128, "http://%s/v2/logon", g_host);
 		cl::StringUtil::char_to_wchar(url, 128, buf);
 
 		char* response;
@@ -47,7 +47,7 @@ namespace Fortunes
 		cJSON_AddItemToObject(root, "password", cJSON_CreateString(pwd));
 		char* str = cJSON_PrintUnformatted(root);
 
-		cl::StringUtil::string_copy(g_host, 256, host);
+		cl::StringUtil::copy(g_host, 256, host);
 
 		cJSON* ret = do_login("/v2/logon", str);
 
@@ -57,7 +57,7 @@ namespace Fortunes
 		if(ret == NULL)	return FALSE;
 
 		cJSON* tokenItem = cJSON_GetObjectItem(ret, "token");
-		cl::StringUtil::string_copy(g_token, 64, tokenItem->valuestring);
+		cl::StringUtil::copy(g_token, 64, tokenItem->valuestring);
 		cJSON_Delete(ret);
 		return TRUE;
 	}
@@ -72,10 +72,10 @@ namespace Fortunes
 		wchar url[128];
 		char buf[128];
 
-		cl::StringUtil::string_format(buf, 128, "Authorization: %s\r\n", g_token);
+		cl::StringUtil::format(buf, 128, "Authorization: %s\r\n", g_token);
 		cl::StringUtil::char_to_wchar(header, 128, buf);
 
-		cl::StringUtil::string_format(buf, 128, "http://%s/v2/instances", g_host);
+		cl::StringUtil::format(buf, 128, "http://%s/v2/instances", g_host);
 		cl::StringUtil::char_to_wchar(url, 128, buf);
 
 		char* response;
@@ -123,11 +123,11 @@ namespace Fortunes
 			infos[i].name = cl_string_alloc(cJSON_GetObjectItem(item, "name")->valuestring); //may be utf8
 
 			const char* str = cJSON_GetObjectItem(item, "status")->valuestring;
-			if(cl::StringUtil::string_compare(str, "stop"))
+			if(cl::StringUtil::compare(str, "stop"))
 				infos[i].status = VMInfo::Stop;
 			else
 			{
-				if(cl::StringUtil::string_compare(str, "running"))
+				if(cl::StringUtil::compare(str, "running"))
 					infos[i].status = VMInfo::Running;
 				else
 					infos[i].status = VMInfo::Disable;
@@ -142,10 +142,10 @@ namespace Fortunes
 			cJSON* mem = cJSON_GetObjectItem(rc, "mem");
 			st mem_v = cJSON_GetObjectItem(mem, "total")->valueint;
 
-			cl::StringUtil::string_format(buf, 64, "%d 核", cpu_v);
+			cl::StringUtil::format(buf, 64, "%d 核", cpu_v);
 			infos[i].cpu = cl_string_alloc(buf);
 
-			cl::StringUtil::string_format(buf, 64, "%d MB", mem_v);
+			cl::StringUtil::format(buf, 64, "%d MB", mem_v);
 			infos[i].mem = cl_string_alloc(buf);
 
 			cJSON* img = cJSON_GetObjectItem(item, "image");
@@ -159,7 +159,7 @@ namespace Fortunes
 				for(st j = 0; j < size; ++j)
 				{
 					item = cJSON_GetArrayItem(gra, j);
-					if(cl::StringUtil::string_compare(cJSON_GetObjectItem(item, "type")->valuestring, "spice"))
+					if(cl::StringUtil::compare(cJSON_GetObjectItem(item, "type")->valuestring, "spice"))
 						break;
 				}
 
@@ -187,13 +187,13 @@ Label_Err:
 		wchar url[128];
 		char buf[128];
 
-		cl::StringUtil::string_format(buf, 128, "Authorization: %s\r\n", g_token);
+		cl::StringUtil::format(buf, 128, "Authorization: %s\r\n", g_token);
 		cl::StringUtil::char_to_wchar(header1, 128, buf);
 
-		cl::StringUtil::string_copy(buf, 128, "Content-Type: application/json\r\n");
+		cl::StringUtil::copy(buf, 128, "Content-Type: application/json\r\n");
 		cl::StringUtil::char_to_wchar(header2, 128, buf);
 
-		cl::StringUtil::string_format(buf, 128, "http://%s/v2/instances/%s/action", g_host, _id);
+		cl::StringUtil::format(buf, 128, "http://%s/v2/instances/%s/action", g_host, _id);
 		cl::StringUtil::char_to_wchar(url, 128, buf);
 
 
@@ -221,7 +221,7 @@ Label_Err:
 		int ret = urlRequest(url, L"POST", arr, 2, str, 0, &code, &response, &len);
 		free(str);
 
-		if(cl::StringUtil::string_compare(response, "null"))
+		if(cl::StringUtil::compare(response, "null"))
 			ret = TRUE;
 		else
 			ret = FALSE;

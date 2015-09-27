@@ -31,5 +31,12 @@ namespace cl
 		static void delete_file(const char* file);
 		static st create_file(const char* file);
 	};
+
+	class FileUtil
+	{
+	public:
+		static File* open(const char* file);
+		//static void 
+	};
 }
 #endif

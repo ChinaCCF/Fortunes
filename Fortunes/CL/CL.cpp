@@ -8,7 +8,7 @@
 
 namespace cl
 {
-	void Logger::printf(const char *file, st line, const char *message)
+	void LoggerUtil::printf(const char *file, st line, const char *message)
 	{
 #if CL_IS_MAC
 		const char* file_name  = strrchr(file, '/');

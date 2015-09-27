@@ -87,6 +87,18 @@
     <ClInclude Include="WL\WindowControls\ScrollView.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="CL\Util\JSON.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CLTest\Test_Object_String.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CLTest\TestCommon.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CLTest\Test.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Fortunes.cpp">
@@ -150,6 +162,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="WL\WindowControls\ScrollView.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="CL\Util\JSON.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

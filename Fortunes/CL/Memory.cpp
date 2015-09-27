@@ -5,7 +5,7 @@ namespace cl
 {
 	void* MemoryUtil::alloc(st size)
 	{
-		return malloc(size);
+		return ::malloc(size);
 	}
 	void* MemoryUtil::realloc(void* p, st size)
 	{
@@ -16,6 +16,16 @@ namespace cl
 		::free(p);
 	}
 
+	void MemoryUtil::copy(void* dst, void* src, st size)
+	{
+		::memcpy(dst, src, size);
+	}
+	void MemoryUtil::zero(void* buf, st size)
+	{
+		::memset(buf, 0, size);
+	}
+
+	
 #if CL_IS_DEBUG
 #include <stdio.h>
 #include <string.h>
@@ -42,6 +52,8 @@ namespace cl
 		}
 	};
 
+#define in_new(T) (new(MemoryUtil::alloc(sizeof(T))) T)
+
 	class MemoryList
 	{
 	public:
@@ -53,7 +65,7 @@ namespace cl
 		}
 		void push(void* p, const char* file, st line, st size)
 		{
-			MemoryNode* node = new(MemoryUtil::alloc(sizeof(MemoryNode))) MemoryNode;
+			MemoryNode* node = in_new(MemoryNode);
 			node->p_ = p;
 			node->file_ = file;
 			node->line_ = line;
@@ -94,7 +106,7 @@ namespace cl
 	inline void push(void* p, const char* file, st line, st size)
 	{
 		if(list == NULL)
-			list = new(MemoryUtil::alloc(sizeof(MemoryList))) MemoryList;
+			list = in_new(MemoryList);
 		list->push(p, file, line, size);
 	}
 
