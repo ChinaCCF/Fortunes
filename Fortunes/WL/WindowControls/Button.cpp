@@ -12,57 +12,66 @@ namespace WL
 			Color bg;
 			st is_down;
 			BaseButton::ButtonStatus status;
-
 			ButtonClick click;
 			void* extra;
-			_BaseButton() { is_down = FALSE;  extra = NULL; click = NULL; status = BaseButton::Normal; }
 		};
 
-		BaseButton::~BaseButton()
-		{
-			cl_delete(self);
-		}
 		st BaseButton::init()
 		{
 			if(!BaseWindow::init()) return FALSE;
 
-			self = cl_new(_BaseButton);
+			self = cl_alloc(_BaseButton);
 			if(self == NULL) return FALSE;
+			self->is_down = FALSE;
+			self->status = Button::Normal;
+			self->click = NULL;
+			self->extra = NULL;
 			return TRUE;
 		}
+		BaseButton::~BaseButton()
+		{
+			cl_delete(self);
+		}
+
 		void BaseButton::set_light(const Color* c)
 		{
-			self->status = Light;
-			if(c) set_background_color(c);
-			else
+			if(self->status != Light)
 			{
-				Color tmp = self->bg;
-				tmp.add_value(+30);
-				BaseWindow::set_background_color(&tmp);
+				self->status = Light;
+				if(c) set_background_color(c);
+				else
+				{
+					Color tmp = self->bg;
+					tmp.add_value(+30);
+					BaseWindow::set_background_color(&tmp);
+				}
 			}
 		}
 		void BaseButton::set_dark(const Color* c)
 		{
-			self->status = Dark;
-			if(c) set_background_color(c);
-			else
+			if(self->status != Dark)
 			{
-				Color tmp = self->bg;
-				tmp.add_value(-30);
-				BaseWindow::set_background_color(&tmp);
+				self->status = Dark;
+				if(c) set_background_color(c);
+				else
+				{
+					Color tmp = self->bg;
+					tmp.add_value(-30);
+					BaseWindow::set_background_color(&tmp);
+				}
 			}
 		}
 		void BaseButton::set_normal(const Color* c)
 		{
-			self->status = Normal;
-			if(c) set_background_color(c);
-			else
-				BaseWindow::set_background_color(&self->bg);
+			if(self->status != Normal)
+			{
+				self->status = Normal;
+				if(c) set_background_color(c);
+				else
+					BaseWindow::set_background_color(&self->bg);
+			}
 		}
-		BaseButton::ButtonStatus BaseButton::get_status()
-		{
-			return self->status;
-		}
+		BaseButton::ButtonStatus BaseButton::get_status() { return self->status; }
 
 		void BaseButton::set_background_color(const Color* c)
 		{
@@ -146,22 +155,14 @@ namespace WL
 		{
 		public:
 			Label* title;
-			_Button() { title = NULL; }
 		};
-
-		Button::~Button()
-		{
-			if(self) cl_delete(self->title);
-			cl_delete(self);
-		}
-
 		st Button::init()
 		{
 			if(!BaseButton::init()) return FALSE;
-			self = cl_new(_Button);
+			self = cl_alloc(_Button);
 			if(self == NULL) return FALSE;
 
-			self->title = cl_new(Label);
+			self->title = cl_new_init(Label);
 			if(self->title == NULL) return FALSE;
 			if(!self->title->init()) return FALSE;
 
@@ -169,6 +170,13 @@ namespace WL
 			self->title->show();
 			return TRUE;
 		}
+		Button::~Button()
+		{
+			if(self) cl_delete(self->title);
+			cl_delete(self);
+		}
+
+		
 		Label* Button::get_title() { return self->title; }
 		void Button::set_frame(const Rect* r)
 		{
@@ -176,9 +184,16 @@ namespace WL
 			ir.x = 0;
 			ir.y = 0;
 			self->title->set_frame(&ir);
-			BaseWindow::set_frame(r);
+			BaseButton::set_frame(r);
 		}
-		void Button::set_frame(ft x, ft y, ft w, ft h) { self->title->set_frame(0, 0, w, h); BaseWindow::set_frame(x, y, w, h); }
-
+		void Button::set_frame(ft x, ft y, ft w, ft h) { self->title->set_frame(0, 0, w, h); BaseButton::set_frame(x, y, w, h); }
+		void Button::redraw(IRender* render)
+		{
+			BaseButton::redraw(render);
+		}
+		st Button::event_for_touch(TouchEvent* e)
+		{
+			return BaseButton::event_for_touch(e);
+		}
 	}
 }

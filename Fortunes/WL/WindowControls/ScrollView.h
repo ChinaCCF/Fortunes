@@ -10,12 +10,12 @@ namespace WL
 		{
 			_ScrollView* self;
 		public:
-			ScrollView() { self = NULL; }
-			~ScrollView();
 			st init();
+			void uninit();
 
 			void set_content_size(WL::Size* size);
 			st event_for_wheel(st direction);
+			virtual void update();
 		};
 	}
 }

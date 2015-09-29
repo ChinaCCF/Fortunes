@@ -11,7 +11,7 @@ namespace cl
 		_File* self;
 	public:
 		st init();
-		void uninit();
+		~File();
 
 		st open(const char* file);
 		void close();
@@ -32,11 +32,10 @@ namespace cl
 		static st create_file(const char* file);
 	};
 
-	class FileUtil
+	/*class FileUtil
 	{
 	public:
 		static File* open(const char* file);
-		//static void 
-	};
+	};*/
 }
 #endif

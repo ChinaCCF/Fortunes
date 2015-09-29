@@ -21,7 +21,7 @@ namespace cl
 		return TRUE;
 	}
 
-	void File::uninit()
+	File::~File()
 	{
 		if(self)
 		{
@@ -112,6 +112,7 @@ namespace cl
 		else
 			return NULL;
 	}
+
 	st File::write_line(const char* line)
 	{
 		st len = strlen(line);
@@ -132,14 +133,15 @@ namespace cl
 		return 0;
 	}
 
+
 	File* File::open_file(const char* file)
 	{
-		File* f = cl_alloc_init(File);
+		File* f = cl_new_init(File);
 		if(f->open(file))
 			return f;
 		else
 		{
-			cl_uninit_free(f);
+			cl_delete(f);
 			return NULL;
 		}
 	}
@@ -147,7 +149,7 @@ namespace cl
 	{
 		f->close();
 		f->self->file = NULL;
-		cl_uninit_free(f);
+		cl_delete(f);
 	}
 	st File::is_exist_file(const char* file)
 	{

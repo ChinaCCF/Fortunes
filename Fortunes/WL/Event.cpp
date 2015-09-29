@@ -13,14 +13,18 @@ namespace WL
 		st val;
 	};
 	/******************************************************/
-	KeyBoardEvent::KeyBoardEvent() { self = NULL; }
-	KeyBoardEvent::~KeyBoardEvent() { cl_delete(self); }
-	st KeyBoardEvent::init(KeyBoardEvent::KeyType type, st val) {
-		self = cl_new(_KeyBoardEvent);
+	st KeyBoardEvent::init()
+	{
+		self = cl_alloc_type(_KeyBoardEvent);
 		if(self == NULL) return FALSE;
+		return TRUE;
+	}	
+	KeyBoardEvent::~KeyBoardEvent() { cl_free(self); }
+
+	void KeyBoardEvent::set(KeyBoardEvent::KeyType type, st val)
+	{
 		self->type = type;
 		self->val = val;
-		return TRUE;
 	}
 	s64 KeyBoardEvent::get_time() { return self->time; }
 	const KeyBoardEvent::KeyType KeyBoardEvent::get_type() { return self->type; }
@@ -39,16 +43,24 @@ namespace WL
 		Point* points;
 	};
 	/******************************************************/
-	TouchEvent::TouchEvent() { self = NULL; }
-	TouchEvent::~TouchEvent() { if(self) cl_free(self->points); cl_delete(self); }
-	st TouchEvent::init(TouchEvent::TouchType type, st count, Point* points)
-	{ 
-		self = cl_new(_TouchEvent);
+	st TouchEvent::init()
+	{
+		self = cl_alloc_type(_TouchEvent);
 		if(self == NULL) return FALSE;
+		return TRUE;
+	}
+	TouchEvent::~TouchEvent() { 
+		if(self) cl_free(self->points);
+		cl_free(self); 
+	}
+	
+	st TouchEvent::set(TouchEvent::TouchType type, st count, Point* points)
+	{
 		self->type = type;
 		self->count = count;
 		self->points = cl_alloc_type_with_count(Point, count);
-		memcpy(self->points, points, count * sizeof(Point));
+		if(self->points == NULL) return FALSE;
+		cl::MemoryUtil::copy(self->points, points, count * sizeof(Point));
 		return TRUE;
 	}
 	s64 TouchEvent::get_time() { return self->time; }

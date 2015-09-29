@@ -51,9 +51,9 @@ namespace WL
 			Key
 		};
 
-		KeyBoardEvent();
-		~KeyBoardEvent();
-		st init(KeyType type, st val);
+		st init();
+		~KeyBoardEvent(); 
+		void set(KeyType type, st val);
 
 		s64 get_time();
 		const KeyType get_type();
@@ -74,9 +74,9 @@ namespace WL
 			Enter,
 			Leave
 		};
-		TouchEvent();
-		~TouchEvent();
-		st init(TouchType type, st count, Point* points);
+		st init();
+		~TouchEvent(); 
+		st set(TouchType type, st count, Point* points);
 
 		s64 get_time();
 		TouchType get_type();

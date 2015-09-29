@@ -8,15 +8,17 @@ namespace WL
 	class Window32
 	{
 		_Window32* self;
-		Window32(const Window32&) {}
-		Window32& operator=(const Window32&) {}
+	private:
+		Window32(const Window32&) {}//forbidden
+		Window32& operator=(const Window32&) {}//forbidden
 	public:
-		Window32();
+		Window32() {}
 		~Window32();
-		st init(const char* class_name = NULL, st style = 0);
+		st init();
 	public:
+		st create(const char* class_name, st style, st ex_style);
 		HWND get_handle();
-		void set_ico(st ico);//resource id
+		void set_ico(st ico_resource_id);//resource id
 		void set_title(const char* title);
 		const char* get_title();
 		void set_parent(HWND parent);
@@ -24,6 +26,8 @@ namespace WL
 		void set_frame(const Rect* r);
 		void set_frame(ft x, ft y, ft w, ft h);
 		void get_frame(Rect* r);
+		ft get_width();
+		ft get_height();
 		void set_is_layer(st val);
 		st get_is_layer();
 		void set_alpha(ft val);

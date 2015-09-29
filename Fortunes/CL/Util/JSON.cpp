@@ -185,7 +185,7 @@ namespace cl
 	{
 		self = cl_alloc_type(_JSON);
 		if(self == NULL) return FALSE;
-
+		return 0;
 	}
 	void JSON::uninit()
 	{

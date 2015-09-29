@@ -11,6 +11,124 @@
 
 namespace Fortunes
 {
+	WL::SubWindow::Label* create_item_label(WL::BaseWindow* win)
+	{
+		WL::Font f;
+		f.init();
+		f.set_size(11);
+		WL::Color c;
+		c.set(0, 0, 0);
+
+		WL::SubWindow::Label* lbl = cl_new(WL::SubWindow::Label);
+		if(lbl == NULL) return NULL;
+		if(!lbl->init()) return NULL;
+
+		lbl->set_text_color(&c);
+		lbl->set_font(&f);
+		win->add_window(lbl);
+		lbl->show();
+		return lbl;
+	}
+
+	static void item_select_click(WL::SubWindow::BaseButton* btn, void* extra);
+	class ListItem : public WL::SubWindow::BaseButton
+	{
+	public:
+		st is_select;
+		WL::SubWindow::Label* name;
+		WL::SubWindow::Label* status;
+		WL::SubWindow::Label* cpu;
+		WL::SubWindow::Label* memory;
+		WL::SubWindow::Label* system;
+		ListItem* next;
+		VMInfo* info;
+
+		st init()
+		{
+			if(!BaseButton::init())return FALSE;
+			name = create_item_label(this);
+			status = create_item_label(this);
+			cpu = create_item_label(this);
+			memory = create_item_label(this);
+			system = create_item_label(this);
+			next = NULL;
+			is_select = FALSE;
+			show();
+			return TRUE;
+		}
+		void uninit()
+		{
+			cl_delete(name);
+			cl_delete(status);
+			cl_delete(cpu);
+			cl_delete(memory);
+			cl_delete(system);
+		}
+		void set_frame(ft x, ft y, ft _w, ft h)
+		{
+			ft w = _w / 5;
+			name->set_frame(0, 0, w, h);
+			status->set_frame(w, 0, w, h);
+			cpu->set_frame(w * 2, 0, w, h);
+			memory->set_frame(w * 3, 0, w, h);
+			system->set_frame(w * 4, 0, w, h);
+
+			BaseWindow::set_frame(x, y, _w, h);
+		}
+		void set_Data(VMInfo* _info)
+		{
+			info = _info;
+			name->set_text(info->name);
+			status->set_text(info->status == VMInfo::Running ? "运行中" : (info->status == VMInfo::Stop ? "已关机" : "操作中"));
+			cpu->set_text(info->cpu);
+			memory->set_text(info->mem);
+			system->set_text(info->sys);
+		}
+		st get_is_select() { return is_select; }
+		void set_is_select(st val)
+		{
+			is_select = val;
+			WL::Color c;
+			if(is_select)
+				c.set(255, 255, 255);
+			else
+				c.set(0, 0, 0);
+
+			name->set_text_color(&c);
+			status->set_text_color(&c);
+			cpu->set_text_color(&c);
+			memory->set_text_color(&c);
+			system->set_text_color(&c);
+			update();
+		}
+		void redraw(WL::IRender* render)
+		{
+			WL::Color c;
+			if(is_select)
+				c.set(0, 111, 222);
+			else
+				c.set(239, 236, 255);
+
+			set_background_color(&c);
+			BaseWindow::redraw(render);
+		}
+	};
+	static ListItem* g_item = NULL;
+	static void item_select_click(WL::SubWindow::BaseButton* btn, void* extra)
+	{
+		ListItem* item = (ListItem*)extra;
+		if(item != g_item)
+		{
+			if(g_item)
+				g_item->set_is_select(FALSE);
+			
+			item->set_is_select(TRUE);
+			g_item = item;
+		}
+		else
+			item->set_is_select(!item->get_is_select());
+	}
+
 	class _Main
 	{
 	public:
@@ -26,7 +144,10 @@ namespace Fortunes
 		WL::SubWindow::Button* refresh;
 
 		WL::SubWindow::ScrollView* list;
-
+		WL::SubWindow::Label* err;
+		VMInfo* infos;
+		st loading;
+		ListItem* items;
 		CloseButton* quit;
 		_Main()
 		{
@@ -41,6 +162,10 @@ namespace Fortunes
 			force_close = NULL;
 			refresh = NULL;
 			list = NULL;
+			err = NULL;
+			items = NULL;
+			infos = NULL;
+
 		}
 	};
 
@@ -60,7 +185,25 @@ namespace Fortunes
 			cl_delete(self->force_close);
 			cl_delete(self->refresh);
 			cl_delete(self->quit);
+			self->list->uninit();
 			cl_delete(self->list);
+			cl_delete(self->err);
+
+			ListItem* item = self->items;
+			while(item)
+			{
+				ListItem* i = item;
+				item = item->next;
+				i->uninit();
+				cl_delete(i);
+			}
+			VMInfo* info = self->infos;
+			while(info)
+			{
+				info->uninit();
+				info = info->next;
+			}
+			cl_free(self->infos);
 		}
 		cl_delete(self);
 	}
@@ -79,7 +222,54 @@ namespace Fortunes
 	}
 	static void refresh_click(WL::SubWindow::BaseButton* btn, void* extra)
 	{
-		NetUtil::get_list();
+		_Main* self = (_Main*)extra;
+		g_item = NULL;
+		self->loading = TRUE;
+		self->err->show();
+
+		{//create thread
+			VMInfo* info = self->infos;
+			while(info)
+			{
+				info->uninit();
+				info = info->next;
+			}
+			cl_free(self->infos);
+
+			ListItem* item = self->items;
+			while(item)
+			{
+				ListItem* i = item;
+				item = item->next;
+				i->uninit();
+				cl_delete(i);
+			}
+			self->items = NULL;
+
+			self->infos = NetUtil::get_list();
+			ft h = 40;
+			st index = 0;
+			info = self->infos;
+			while(info)
+			{
+				item = cl_alloc_init(ListItem);
+				item->set_click(item_select_click, item);
+				item->set_frame(0, index * h, 700, h);
+				item->set_Data(info);
+				self->list->add_window(item);
+				item->next = self->items;
+				self->items = item;
+				item->show();
+				info = info->next;
+				++index;
+			}
+			WL::Size size;
+			size.set(0, index * h);
+			self->list->set_content_size(&size);
+		}
+
+		self->loading = FALSE;
+		self->err->hide();
 	}
 	WL::SubWindow::Label* create_label(const char* txt, ft x, ft y, ft w, ft h)
 	{
@@ -184,15 +374,35 @@ namespace Fortunes
 		self->quit->show();
 		self->quit->set_click(quit_click, this);
 
-
-		self->list = cl_new(WL::SubWindow::ScrollView);
+		self->list = cl_alloc_init(WL::SubWindow::ScrollView);
 		if(self->list == NULL) return FALSE;
-		if(!self->list->init()) return FALSE;
 		add_window(self->list);
+		self->list->set_frame(0, 50, 700, 400 - 50 - 50);
+		WL::Color c;
+		c.set(239, 236, 255);
+		self->list->set_background_color(&c);
+		self->list->show();
+
+		c.set(0, 0, 0);
+		WL::Font f;
+		f.init();
+		f.set_size(11);
+
+		self->err = cl_new(WL::SubWindow::Label);
+		if(self->err == NULL) return NULL;
+		if(!self->err->init()) return NULL;
+		self->err->set_text_color(&c);
+		self->err->set_font(&f);
+		self->err->set_text("加载中");
+		self->err->set_frame(0, 0, 700, 300);
+		self->list->add_window(self->err);
+		self->err->show();
+
+		refresh_click(NULL, self);
+
 		show();
 		return TRUE;
 	}
-
 
 	void Main::redraw(WL::IRender* render)
 	{
@@ -201,6 +411,11 @@ namespace Fortunes
 		WL::Rect tmp;
 		tmp.set(0, 0, 700, 50);
 		render->fill_rect(&tmp);
+
+		//WL::Color c;
+		//c.set(0,0,0);
+		//render->set_color(&c);
+		//render->fill_rect(0,49,700, 1);
 
 		WL::Color cb;
 		WL::Color ct;

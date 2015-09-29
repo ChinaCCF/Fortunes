@@ -19,6 +19,7 @@ namespace WL
 		st red, green, blue;
 		Color() { alpha = 1.0; red = 255; green = 255; blue = 255; }
 		Color(st r, st g, st b) { alpha = 1.0; red = r; green = g; blue = b; }
+		Color(ft a, st r, st g, st b) { alpha = a; red = r; green = g; blue = b; }
 		void set(st r, st g, st b) { red = r; green = g; blue = b; }
 		void set(ft a, st r, st g, st b) { alpha = a; red = r; green = g; blue = b; }
 

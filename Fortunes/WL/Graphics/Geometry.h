@@ -6,8 +6,8 @@ namespace WL
 	class Point
 	{
 	public:
-		ft x, y;
-		Point() { x = 0; y = 0; }
+		ft x, y; 
+		Point(ft _x = 0, ft _y = 0) { x = _x; y = _y; }
 		void set(ft _x, ft _y) { x = _x; y = _y; }
 	};
 
@@ -15,8 +15,7 @@ namespace WL
 	{
 	public:
 		ft w, h;
-		Size() { w = 0; h = 0; }
-		Size(ft _w, ft _h) { w = _w; h = _h; }
+		Size(ft _w = 0, ft _h = 0) { w = _w; h = _h; }
 		void set(ft _w, ft _h) { w = _w; h = _h; }
 
 		void fit_in(const Size* size)
@@ -39,6 +38,7 @@ namespace WL
 	class Rect : public Point, public Size
 	{
 	public:
+		Rect(ft _x = 0, ft _y = 0, ft _w = 0, ft _h = 0) { x = _x; y = _y; w = _w; h = _h; }
 		void set(ft x, ft y, ft w, ft h) { Point::set(x, y); Size::set(w, h); }
 
 		st operator ==(const Rect& r)

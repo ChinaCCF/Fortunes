@@ -125,7 +125,8 @@ namespace cl
 		static inline u16 rotate(u16 val, ut n, st is_right = TRUE) { if(is_right) return val >> n | val << (16 - n); return val << n | val >> (16 - n); }
 		static inline u32 rotate(u32 val, ut n, st is_right = TRUE) { if(is_right) return val >> n | val << (32 - n); return val << n | val >> (32 - n); }
 		static inline u64 rotate(u64 val, ut n, st is_right = TRUE) { if(is_right) return val >> n | val << (64 - n); return val << n | val >> (64 - n); }
-
+		static inline st is_contain_bits(st flags, st bits) { st val = flags & bits; if(val == bits) return TRUE; return FALSE; }
+		static inline st is_float_equ(ft f1, ft f2, ft offset = 0.001) { ft val = abs(f1 - f2); if(val < offset) return TRUE; return FALSE; }
 	};
 
 #if CL_IS_DEBUG
@@ -142,17 +143,29 @@ namespace cl
 
 #define cl_alloc_type(T)                ((T*)cl_alloc(sizeof(T)))
 #define cl_alloc_type_with_count(T, n)  ((T*)cl_alloc(sizeof(T) * n))
-#define cl_new(T)                       (new(cl_alloc_type(T)) T)
+
+	template<typename T>
+	static inline T* _cl_new(T* obj)
+	{
+		if(obj) return new(obj)T;
+		return NULL;
+	}
+#define cl_new(T) cl::_cl_new(cl_alloc_type(T))
 
 	template<typename T>
 	static inline T* _cl_init(T* obj)
 	{
-		if(!obj) return NULL;
-		if(obj->init()) return obj;
-		cl_free(obj); return NULL;
+		if(obj)
+		{
+			new(obj)T;//for class member
+			if(obj->init()) return obj;
+			delete obj;
+			return NULL;
+		}
+		return NULL;
 	}
-#define cl_alloc_init(T) cl::_cl_init(cl_alloc_type(T))
-#define cl_uninit_free(p) do{if(p){p->uninit(); cl_free(p);}}while(0)
+#define cl_new_init(T) cl::_cl_init(cl_alloc_type(T))
+
 
 	template<typename T>
 	class Auto
@@ -160,7 +173,7 @@ namespace cl
 		T* p;
 	public:
 		Auto(T* _p) { p = _p; }
-		~Auto() { cl_uninit_free(p); }
+		~Auto() { cl_delete(p); }
 
 		T* operator->() { return p; }
 		T& operator*() { return *p; }
@@ -171,7 +184,8 @@ namespace cl
 			return FALSE;
 		}
 		st operator!=(st val) { return operator==(val); }
+		operator st() { return p != NULL; }
 	};
-#define cl_auto_alloc_init(T) cl::Auto<T>(cl_alloc_init(T))
+#define cl_auto_new_init(T) cl::Auto<T>(cl_new_init(T))
 }
 #endif

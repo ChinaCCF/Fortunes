@@ -6,34 +6,6 @@
 
 namespace WL
 {
-	class _Window32
-	{
-	public:
-		HWND hwnd;
-		char* text;
-		Rect frame;
-		st is_layer;
-		st is_child;
-		ft alpha;
-		st has_show;
-		BaseWindow* dispatcher;
-		st is_mouse_track;
-		WNDPROC ctrl_proc;//warnning, this member is only valid in 32bit system
-		_Window32()
-		{
-			hwnd = NULL;
-			text = NULL;
-			frame.set(0, 0, 100, 100);
-			is_layer = FALSE;
-			is_child = FALSE;
-			has_show = FALSE;
-			alpha = 1.0;
-			dispatcher = NULL;
-			is_mouse_track = FALSE;
-			ctrl_proc = NULL;
-		}
-	};
-
 	/************************************************************************************************/
 	/************************************************************************************************/
 	static LRESULT CALLBACK Window_Process(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -69,38 +41,72 @@ namespace WL
 		return TRUE;
 	}
 
-	static HWND create_window(const char* class_name, st style)
+	static HWND create_window(const char* class_name, st style, st exstyle, Rect* r)
 	{
 		DWORD flags = WS_POPUP;
 		DWORD ex_flags = WS_EX_ACCEPTFILES | WS_EX_APPWINDOW | WS_EX_NOPARENTNOTIFY | WS_EX_TRANSPARENT;
 		if(style) flags |= style;
-		return CreateWindowExA(ex_flags, class_name, ""/*title*/, flags, 0, 0, 1, 1, NULL/*parent*/, NULL/*menu*/, g_application_instance, NULL/*extra*/);
+		if(exstyle) ex_flags |= exstyle;
+		return CreateWindowExA(ex_flags, class_name, ""/*title*/, flags,
+							   (st)r->x, (st)r->y, (st)r->w, (st)r->h,
+							   NULL/*parent*/, NULL/*menu*/, g_application_instance, NULL/*extra*/);
 	}
 	/************************************************************************************************/
 	/************************************************************************************************/
-	Window32::Window32() { self = NULL; }
+	class _Window32
+	{
+	public:
+		HWND hwnd;//window handle
+		char* text;//window title
+		Rect frame;
+		st is_layer;//has exstyle WS_EX_LAYERED
+		ft alpha;
+		st has_show;
+		BaseWindow* dispatcher;//event handle
+		st is_mouse_track;
+		WNDPROC ctrl_proc;
+	};
+
 	Window32::~Window32()
 	{
 		if(self)
 		{
 			cl_free(self->text);
 			if(self->hwnd)
+			{
+				SetWindowLongPtrA(self->hwnd, GWLP_USERDATA, 0);
 				DestroyWindow(self->hwnd);
+			}
 		}
 		cl_delete(self);
 	}
-
-	st Window32::init(const char* class_name, st style)
+	st Window32::init()
 	{
-		self = cl_new(_Window32);
+		self = cl_alloc_type(_Window32);
 		if(self == NULL) return FALSE;
 
+		self->hwnd = NULL;
+		self->text = NULL;
+		self->frame.set(0, 0, 100, 100);
+		self->is_layer = FALSE;
+		self->alpha = 1.0;
+		self->has_show = FALSE;
+		self->dispatcher = NULL;
+		self->is_mouse_track = FALSE;
+		self->ctrl_proc = NULL;
+		return TRUE;
+	}
+
+	st Window32::create(const char* class_name, st style, st ex_style)
+	{
 		if(class_name == NULL)
 		{
 			class_name = "WLWindow";
 			if(!register_window_class(class_name, Window_Process)) return FALSE;
 		}
-		self->hwnd = create_window(class_name, style);
+		if(cl::MemoryUtil::is_contain_bits(ex_style, WS_EX_LAYERED))
+			self->is_layer = TRUE;
+		self->hwnd = create_window(class_name, style, ex_style, &self->frame);
 		if(self->hwnd)
 			SetWindowLongPtrA(self->hwnd, GWLP_USERDATA, (LONG)self);
 		else
@@ -108,7 +114,6 @@ namespace WL
 
 		if(strcmp(class_name, "edit") == 0)
 			self->ctrl_proc = (WNDPROC)SetWindowLongPtrA(self->hwnd, GWL_WNDPROC, (LONG)Text_Process);
-
 		return TRUE;
 	}
 
@@ -122,25 +127,21 @@ namespace WL
 			SetWindowTextA(self->hwnd, self->text);
 	}
 	const char* Window32::get_title() { return self->text; }
-	void Window32::set_parent(HWND parent)
-	{
-		if(parent)
-			self->is_child = TRUE;
-		else
-			self->is_child = FALSE;
-		SetParent(self->hwnd, parent);
-	}
+	void Window32::set_parent(HWND parent) { SetParent(self->hwnd, parent); }
 	HWND Window32::get_parent() { return GetParent(self->hwnd); }
 	void Window32::set_frame(const Rect* r) { set_frame(r->x, r->y, r->w, r->h); }
 	void Window32::set_frame(ft x, ft y, ft w, ft h)
 	{
 		st need_redraw = FALSE;
-		if(w != self->frame.w || h != self->frame.h)
-			need_redraw = TRUE;
+		if(!cl::MemoryUtil::is_float_equ(w, self->frame.w)
+		   || !cl::MemoryUtil::is_float_equ(h, self->frame.h))
+		   need_redraw = TRUE;
 		self->frame.set(x, y, w, h);
 		MoveWindow(self->hwnd, (st)x, (st)y, (st)w, (st)h, need_redraw);
 	}
 	void Window32::get_frame(Rect* r) { *r = self->frame; }
+	ft Window32::get_width() { return self->frame.w; }
+	ft Window32::get_height() { return self->frame.h; }
 	void Window32::set_is_layer(st val)
 	{
 		if(val != self->is_layer)
@@ -169,10 +170,10 @@ namespace WL
 	}
 	ft Window32::get_alpha() { return self->alpha; }
 
-
 	void Window32::update()
 	{
-		if(self->is_child)
+		HWND parent = get_parent();
+		if(parent)
 			InvalidateRect(self->hwnd, NULL, FALSE);
 		else
 			UpdateWindow(self->hwnd);
@@ -181,13 +182,10 @@ namespace WL
 	{
 		if(!self->has_show)
 		{
-			if(!self->is_child)
+			HWND parent = get_parent();
+			if(!parent)
 			{
-				int w = GetSystemMetrics(SM_CXSCREEN);
-				int h = GetSystemMetrics(SM_CYSCREEN);
-				Rect screen;
-				screen.set(0, 0, w, h);
-
+				Rect screen(0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
 				self->frame.move_to_center_in(&screen);
 			}
 
@@ -215,11 +213,7 @@ namespace WL
 		{
 			PAINTSTRUCT ps;
 			HDC hdc = BeginPaint(win->hwnd, &ps);
-
-			st w = ps.rcPaint.right - ps.rcPaint.left;
-			st h = ps.rcPaint.bottom - ps.rcPaint.top;
-			WL::Rect r;
-			r.set(0, 0, w, h);
+			WL::Rect r(0, 0, ps.rcPaint.right - ps.rcPaint.left, ps.rcPaint.bottom - ps.rcPaint.top);
 
 			WL::IRender* gdi = WL::IRender::create_gdi_render(hdc);
 			if(gdi == NULL) return FALSE;
@@ -236,12 +230,17 @@ namespace WL
 	{
 		if(win->dispatcher)
 		{
-			Point p;
-			p.set(LOWORD(l), HIWORD(l));
+
 			WL::TouchEvent e;
-			if(!e.init(type, 1, &p)) return FALSE;
-			win->dispatcher->event_for_touch(&e);
-			return TRUE;
+			if(e.init())
+			{
+				Point p(LOWORD(l), HIWORD(l));
+				if(e.set(type, 1, &p))
+				{
+					win->dispatcher->event_for_touch(&e);
+					return TRUE;
+				}
+			}
 		}
 		return FALSE;
 	}
@@ -258,7 +257,8 @@ namespace WL
 	{
 		if(win->dispatcher)
 		{
-			st direction = HIWORD(w);
+			s16 direction = HIWORD(w);
+			direction /= 120;
 			win->dispatcher->event_for_wheel(direction);
 			return TRUE;
 		}
@@ -341,8 +341,12 @@ namespace WL
 			case WM_CHAR:
 				{
 					WL::KeyBoardEvent e;
-					e.init(WL::KeyBoardEvent::Char, wParam);
-					if(win->dispatcher->event_for_keyboard(&e)) return 0;
+					if(e.init())
+					{
+						e.set(WL::KeyBoardEvent::Char, wParam);
+						if(win->dispatcher->event_for_keyboard(&e))
+							return 0;
+					}
 				}
 			default:
 				return win->ctrl_proc(hWnd, message, wParam, lParam);

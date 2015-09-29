@@ -6,13 +6,15 @@ namespace WL
 	class IView
 	{
 	public:
-		
 		virtual void set_frame(const Rect* r) {}
 		virtual void set_frame(st x, st y, st w, st h) {}
 		virtual void get_frame(const Rect* r) {}
-
+		virtual ft get_width() { return 0; }
+		virtual ft get_height() { return 0; }
+		
 		virtual void set_background_color(const Color* c) {}
 		virtual void set_background_color(st r, st g, st b) {}
+		virtual void set_background_color(ft a, st r, st g, st b) {}
 		virtual void get_background_color(const Color* c) {}
 
 		virtual void set_alpha(ft val) {}
@@ -20,7 +22,6 @@ namespace WL
 
 		virtual void show() {}
 		virtual void hide() {}
-
 		virtual void update() {}
 		virtual void redraw(const IRender* render) {}
 

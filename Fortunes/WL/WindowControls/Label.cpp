@@ -11,8 +11,6 @@ namespace WL
 			char* text;
 			Font font;
 			Color color;
-
-			_Label() { text = NULL; }
 		};
 
 		Label::~Label()
@@ -24,10 +22,8 @@ namespace WL
 		st Label::init()
 		{
 			if(!BaseWindow::init()) return FALSE;
-			self = cl_new(_Label);
-			if(self == NULL)
-				return FALSE;
-			if(!self->font.init()) return FALSE;
+			self = cl_alloc(_Label);
+			if(self == NULL) return FALSE;
 			return TRUE;
 		}
 		void Label::set_text(const char* text)
@@ -45,6 +41,19 @@ namespace WL
 		{
 			self->font = *font;
 			update();
+		}
+		void Label::set_font_size(st size)
+		{
+			self->font.set_size(size);
+			update();
+		}
+		void Label::set_font_is_bold(st val)
+		{
+			self->font.set_is_bold();
+		}
+		void Label::set_font_name(const char* name)
+		{
+
 		}
 		void Label::get_font(Font* font) { *font = self->font; }
 

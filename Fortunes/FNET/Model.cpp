@@ -110,10 +110,13 @@ namespace Fortunes
 
 		VMInfo* infos = cl_alloc_type_with_count(VMInfo, size);
 		if(infos == NULL) goto Label_Err;
-		memset(infos, 0, sizeof(infos) * size);
+		
 		for(st i = 0; i < size - 1; ++i)
+		{
+			infos[i].init();
 			infos[i].next = infos + i + 1;
-		infos[size - 1].next = NULL;
+		}
+		infos[size - 1].init();
 
 		for(st i = 0; i < size; ++i)
 		{
