@@ -30,61 +30,7 @@
     <ClInclude Include="Resource\Resource.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="WL\Window32.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="WL\Graphics\Geometry.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="WL\Graphics\Graphics.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="UI\Login.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="WL\Window.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="WL\Graphics\Render.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="WL\Event.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="WL\View.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="WL\WindowControls\Button.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="WL\WindowControls\Image.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="WL\WindowControls\Label.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="WL\WindowControls\TextInput.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="UI\Main.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="UI\Common.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="CL\IO\File.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="FNET\cJSON.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="FNET\http.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="FNET\Model.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="WL\WindowControls\ScrollView.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="CL\Util\JSON.h">
@@ -97,6 +43,15 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="CLTest\Test.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="WL\Graphics\Geometry.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="WL\Graphics\Graphics.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="WL\Graphics\Render.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -113,58 +68,13 @@
     <ClCompile Include="CL\Memory.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="WL\Window.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="WL\Event.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="WL\Graphics\Render.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="WL\Window32.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="WL\WindowControls\Button.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="WL\WindowControls\Image.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="WL\WindowControls\Label.cpp">
+    <ClCompile Include="CL\Util\JSON.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="WL\Graphics\Graphics.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="WL\WindowControls\TextInput.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="UI\Login.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="UI\Main.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="UI\Common.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="CL\IO\File.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="FNET\cJSON.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="FNET\http.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="FNET\Model.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="WL\WindowControls\ScrollView.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="CL\Util\JSON.cpp">
+    <ClCompile Include="WL\Graphics\Render.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

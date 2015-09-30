@@ -1,6 +1,4 @@
-#include <CL/CL.h>
-#include <math.h>
-#include <CL/Object/String.h>
+#include <CL/CL.h>  
 #include <Windows.h>
 #include <CL/Memory.h>
 
@@ -11,15 +9,14 @@ namespace WL
 	class Color
 	{
 	public:
-		enum
-		{
-			Color_Max_Value = 255
-		};
-		ft alpha;
-		st red, green, blue;
-		Color() { alpha = 1.0; red = 255; green = 255; blue = 255; }
+		ft alpha = 1.0;
+		st red = 255;
+		st green = 255;
+		st blue = 255;
+		Color() = default;
 		Color(st r, st g, st b) { alpha = 1.0; red = r; green = g; blue = b; }
 		Color(ft a, st r, st g, st b) { alpha = a; red = r; green = g; blue = b; }
+		st init() { return TRUE; }
 		void set(st r, st g, st b) { red = r; green = g; blue = b; }
 		void set(ft a, st r, st g, st b) { alpha = a; red = r; green = g; blue = b; }
 
@@ -35,7 +32,7 @@ namespace WL
 		}
 		st operator==(const Color& c)
 		{
-			if(abs(alpha - c.alpha) >= 0.01) return FALSE;
+			if(!cl::MemoryUtil::is_float_equ(alpha, c.alpha)) return FALSE;
 			if(red != c.red) return FALSE;
 			if(green != c.green) return FALSE;
 			if(blue != c.blue) return FALSE;
@@ -45,45 +42,36 @@ namespace WL
 		st operator != (const Color& c) { return !this->operator==(c); }
 	};
 
-	class _Font;
 	class Font
 	{
-		_Font* self;
-	public: 
-		Font() { self = NULL; }
-		~Font(); 
+		char* name_ = NULL;
+		HFONT font_ = NULL;
+	public:
+		st size = 15;
+		st is_bold = FALSE;
+		cl_define_property(Font, const char*, name);
+		Font();
+		Font(const Font&) = delete;
+		Font& operator = (const Font&) = delete;
+		~Font();
 		st init();
-
-		void set_size(st val);
-		st get_size() const;
-
-		void set_is_bold(st val);
-		st get_is_bold() const;
-
-		void set_name(const char* name);
-		const char* get_name() const;
-
-		void* get_HFONT();
-
-		Font* copy();
-		Font& operator = (const Font&);
+		operator HFONT();
 	};
 
-	class _ImageData;
 	class ImageData
 	{
-		_ImageData* self;
+		st has_chage_ = TRUE;
+		char* file_ = NULL;
+		void* data_ = NULL;
 	public:
-		ImageData() { self = NULL; }
-		~ImageData();
-		st init();
-		 
-		void set_file(const char* file);
-		const char* get_file();
-
-		st get_width();
-		st get_height();
-
-		void* get_image();//Gdiplus::Image
+		ImageData();
+		ImageData(const ImageData&) = delete;
+		ImageData& operator = (const ImageData&) = delete;
+		~ImageData(); 
+		st init() { return TRUE; }
+		cl_define_property(ImageData, const char*, file);
+		cl_define_readonly_property(ImageData, st, width);
+		cl_define_readonly_property(ImageData, st, height);
+		cl_define_readonly_property(ImageData, void*, image);
 	};
 }

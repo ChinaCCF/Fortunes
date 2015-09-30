@@ -84,49 +84,19 @@
     <ClInclude Include="CL\Object\Array.h" />
     <ClInclude Include="CL\Object\String.h" />
     <ClInclude Include="CL\Util\JSON.h" />
-    <ClInclude Include="FNET\cJSON.h" />
-    <ClInclude Include="FNET\http.h" />
-    <ClInclude Include="FNET\Model.h" />
     <ClInclude Include="Resource\Resource.h" />
-    <ClInclude Include="UI\Common.h" />
-    <ClInclude Include="UI\Login.h" />
-    <ClInclude Include="UI\Main.h" />
-    <ClInclude Include="WL\Event.h" />
     <ClInclude Include="WL\Graphics\Geometry.h" />
     <ClInclude Include="WL\Graphics\Graphics.h" />
     <ClInclude Include="WL\Graphics\Render.h" />
-    <ClInclude Include="WL\View.h" />
-    <ClInclude Include="WL\Window.h" />
-    <ClInclude Include="WL\Window32.h" />
-    <ClInclude Include="WL\WindowControls\Button.h" />
-    <ClInclude Include="WL\WindowControls\Image.h" />
-    <ClInclude Include="WL\WindowControls\Label.h" />
-    <ClInclude Include="WL\WindowControls\ScrollView.h" />
-    <ClInclude Include="WL\WindowControls\TextInput.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CL\CL.cpp" />
-    <ClCompile Include="CL\IO\File.cpp" />
     <ClCompile Include="CL\Memory.cpp" />
     <ClCompile Include="CL\Object\String.cpp" />
     <ClCompile Include="CL\Util\JSON.cpp" />
-    <ClCompile Include="FNET\cJSON.cpp" />
-    <ClCompile Include="FNET\http.cpp" />
-    <ClCompile Include="FNET\Model.cpp" />
     <ClCompile Include="Fortunes.cpp" />
-    <ClCompile Include="UI\Common.cpp" />
-    <ClCompile Include="UI\Login.cpp" />
-    <ClCompile Include="UI\Main.cpp" />
-    <ClCompile Include="WL\Event.cpp" />
     <ClCompile Include="WL\Graphics\Graphics.cpp" />
     <ClCompile Include="WL\Graphics\Render.cpp" />
-    <ClCompile Include="WL\Window.cpp" />
-    <ClCompile Include="WL\Window32.cpp" />
-    <ClCompile Include="WL\WindowControls\Button.cpp" />
-    <ClCompile Include="WL\WindowControls\Image.cpp" />
-    <ClCompile Include="WL\WindowControls\Label.cpp" />
-    <ClCompile Include="WL\WindowControls\ScrollView.cpp" />
-    <ClCompile Include="WL\WindowControls\TextInput.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource\Fortunes.rc" />

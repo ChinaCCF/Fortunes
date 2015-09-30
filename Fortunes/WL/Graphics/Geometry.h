@@ -6,16 +6,22 @@ namespace WL
 	class Point
 	{
 	public:
-		ft x, y; 
-		Point(ft _x = 0, ft _y = 0) { x = _x; y = _y; }
+		ft x = 0;
+		ft y = 0;
+		Point() = default;
+		Point(ft _x, ft _y) { x = _x; y = _y; }
+		st init() { return TRUE; }
 		void set(ft _x, ft _y) { x = _x; y = _y; }
 	};
 
 	class Size
 	{
 	public:
-		ft w, h;
-		Size(ft _w = 0, ft _h = 0) { w = _w; h = _h; }
+		ft w = 0;
+		ft h = 0;
+		Size() = default;
+		Size(ft _w, ft _h) { w = _w; h = _h; }
+		st init() { return TRUE; }
 		void set(ft _w, ft _h) { w = _w; h = _h; }
 
 		void fit_in(const Size* size)
@@ -38,7 +44,9 @@ namespace WL
 	class Rect : public Point, public Size
 	{
 	public:
-		Rect(ft _x = 0, ft _y = 0, ft _w = 0, ft _h = 0) { x = _x; y = _y; w = _w; h = _h; }
+		Rect() = default;
+		Rect(ft _x, ft _y, ft _w, ft _h) { x = _x; y = _y; w = _w; h = _h; }
+		st init() { return TRUE; }
 		void set(ft x, ft y, ft w, ft h) { Point::set(x, y); Size::set(w, h); }
 
 		st operator ==(const Rect& r)
@@ -77,8 +85,7 @@ namespace WL
 
 		st test_point(const Point* p)
 		{
-			if(p->x < 0 || p->y < 0 || p->x > w || p->y > h)
-				return FALSE;
+			if(p->x < 0 || p->y < 0 || p->x > w || p->y > h) return FALSE;
 			return TRUE;
 		}
 		void shrink(st val)

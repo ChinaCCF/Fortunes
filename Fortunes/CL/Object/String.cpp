@@ -184,6 +184,38 @@ namespace cl
 		return TRUE;
 	}
 
+#if CL_IS_DEBUG
+	char* StringUtil::alloc_chars_for_wchars(const wchar* str, const char* file, st line)
+#else
+	char* StringUtil::alloc_chars_for_wchars(const wchar* str)
+#endif
+	{
+		st len = wchar_to_char_count(str);
+#if CL_IS_DEBUG
+		char* buf = (char*)MemoryUtil::_alloc(len, file, line);
+#else
+		char* buf = (char*)MemoryUtil::alloc(len);
+#endif
+		if(!wchar_to_char(buf, len, str)) { cl_free(buf); return NULL; }
+		return buf;
+	}
+
+#if CL_IS_DEBUG
+	wchar* StringUtil::alloc_wchars_for_chars(const char* str, const char* file, st line)
+#else
+	wchar* StringUtil::alloc_wchars_for_chars(const char* str)
+#endif
+	{
+		st len = char_to_wchar_count(str);
+#if CL_IS_DEBUG
+		wchar* buf = (wchar*)MemoryUtil::_alloc(len * sizeof(wchar), file, line);
+#else
+		wchar* buf = (wchar*)MemoryUtil::alloc(len * sizeof(wchar));
+#endif
+		if(!char_to_wchar(buf, len, str)) { cl_free(buf); return NULL; }
+		return buf;
+	}
+
 	st StringUtil::parse_hex(const char* str, st* val)
 	{
 		if(*str == '0')

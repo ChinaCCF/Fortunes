@@ -11,18 +11,16 @@ namespace WL
 	static LRESULT CALLBACK Window_Process(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 	static LRESULT CALLBACK Text_Process(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-	static HINSTANCE g_application_instance = NULL;
-
 	static st register_window_class(const char* class_name, WNDPROC fun)
 	{
 		WNDCLASSEXA wcex;
 		if(!GetClassInfoExA(NULL, class_name, &wcex))
 		{
-			if(!GetClassInfoExA(g_application_instance, class_name, &wcex))
+			if(!GetClassInfoExA(Window32::application, class_name, &wcex))
 			{
-				if(g_application_instance == NULL)
+				if(Window32::application == NULL)
 				{
-					cl_printf("g_application_instance is NULL!");
+					cl_printf("Window32 application is NULL!");
 					return FALSE;
 				}
 
@@ -31,7 +29,7 @@ namespace WL
 				wcex.style = CS_HREDRAW | CS_VREDRAW | CS_SAVEBITS;
 				//wcex.cbWndExtra = sizeof(void*);
 				wcex.lpfnWndProc = fun;
-				wcex.hInstance = g_application_instance;
+				wcex.hInstance = Window32::application;
 				wcex.hCursor = LoadCursorA(NULL, IDC_ARROW);
 				//wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
 				wcex.lpszClassName = class_name;
@@ -49,7 +47,7 @@ namespace WL
 		if(exstyle) ex_flags |= exstyle;
 		return CreateWindowExA(ex_flags, class_name, ""/*title*/, flags,
 							   (st)r->x, (st)r->y, (st)r->w, (st)r->h,
-							   NULL/*parent*/, NULL/*menu*/, g_application_instance, NULL/*extra*/);
+							   NULL/*parent*/, NULL/*menu*/, Window32::application, NULL/*extra*/);
 	}
 	/************************************************************************************************/
 	/************************************************************************************************/
@@ -57,11 +55,12 @@ namespace WL
 	{
 	public:
 		HWND hwnd;//window handle
-		char* text;//window title
+		char* title;//window title
 		Rect frame;
 		st is_layer;//has exstyle WS_EX_LAYERED
 		ft alpha;
 		st has_show;
+		st ico;
 		BaseWindow* dispatcher;//event handle
 		st is_mouse_track;
 		WNDPROC ctrl_proc;
@@ -200,10 +199,6 @@ namespace WL
 	void Window32::set_focus() { SetFocus(self->hwnd); }
 
 	void Window32::set_dispatcher(void* dispatcher) { self->dispatcher = (BaseWindow*)dispatcher; }
-	/*********************************************************************************/
-	void Window32::set_application(HINSTANCE ins) { g_application_instance = ins; }
-	void Window32::loop() { MSG msg; while(GetMessage(&msg, NULL, 0, 0)) { TranslateMessage(&msg); DispatchMessage(&msg); } }
-	void Window32::exit() { PostQuitMessage(0); }
 
 	/*********************************************************************************/
 	/*********************************************************************************/

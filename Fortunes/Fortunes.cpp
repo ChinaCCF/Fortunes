@@ -6,28 +6,48 @@
 #include <tchar.h>
 
 #include <CL/Memory.h>
-#include <WL/Window32.h>
-#include <CL/Object/String.h>
-#include <UI/Login.h>
-#include <UI/Main.h>
+//#include <WL/Window32.h>
+//#include <CL/Object/String.h>
+//#include <UI/Login.h>
+//#include <UI/Main.h>
+//
+//#include <CLTest/Test.h>
+//#include <CL/Object/String.h>
 
-#include <CLTest/Test.h>
-#include <CL/Object/String.h>
 
+class A
+{  
+public:
+	cl_property(A, int, age); 
+	A() : cl_init_property(A, age) {}
+};
  
+class B : public A
+{
+	int age_;
+public:
+	B() :cl_init_property(B, age) {}
+	int get_age() { return age_; }
+	void set_age(int val) { age_ = val; }
+};
+
+
 
 int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 					   _In_opt_ HINSTANCE hPrevInstance,
 					   _In_ LPTSTR    lpCmdLine,
 					   _In_ int       nCmdShow)
-{
-	WL::Window32::set_application(hInstance);
+{ 
+	B a;
+	a.age = 2;
+	int ag = a.age;
+
+	/*WL::Window32::set_application(hInstance);
 	Fortunes::Login* login = cl_new(Fortunes::Login);
 	login->init();
 	WL::Window32::loop();
-#if CL_IS_DEBUG
+	#if CL_IS_DEBUG
 	cl::MemoryUtil::check();
-#endif
+	#endif*/
 	return 0;
 }
-

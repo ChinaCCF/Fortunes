@@ -6,54 +6,51 @@
 
 namespace WL
 {
-#define TO_RECT(r) Gdiplus::Rect((INT)r->x, (INT)r->y, (INT)r->w, (INT)r->h)
-#define TO_POINT(p) Gdiplus::Point((INT)p->x, (INT)p->y)
-#define TO_POINTF(p) Gdiplus::PointF((Gdiplus::REAL)p->x, (Gdiplus::REAL)p->y)
-#define TO_COLOR(c) Gdiplus::Color((BYTE)(c->alpha * 255), c->red, c->green, c->blue)
+#define TO_RECT(r)			Gdiplus::Rect((INT)r->x, (INT)r->y, (INT)r->w, (INT)r->h)
+#define TO_POINT(p)			Gdiplus::Point((INT)p->x, (INT)p->y)
+#define TO_POINTF(p)		Gdiplus::PointF((Gdiplus::REAL)p->x, (Gdiplus::REAL)p->y)
+#define TO_COLOR(c)			Gdiplus::Color((BYTE)(c->alpha * 255), c->red, c->green, c->blue)
 	/***********************************************************************************/
 	/***********************************************************************************/
 	class GDI : public IRender
 	{
-		ULONG_PTR gdiplus_token;
-		HDC hdc;
-		Gdiplus::Graphics* graphics;
-		Gdiplus::Color* color;
-		ft width;
-		Gdiplus::Font* font;
+		HDC hdc_ = NULL;
+		ULONG_PTR gdiplus_token_ = NULL;
+		Gdiplus::Graphics* graphics_ = NULL;
+
+		Gdiplus::Color* color_ = NULL;
+		Color _color_;
+		Gdiplus::Font* font_ = NULL;
+		Font _font_;
+		ft line_width_ = 1.0;
 	public:
-		GDI()
-		{
-			gdiplus_token = NULL;
-			graphics = NULL;
-			color = NULL;
-			width = 1.0;
-		}
+		GDI() = default;
 		~GDI()
 		{
-			delete color;
-			delete font;
-			if(graphics)
+			if(font_) delete font_;
+			if(color_) delete color_;
+		
+			if(graphics_)
 			{
-				graphics->ReleaseHDC(hdc);
-				delete graphics;
+				graphics_->ReleaseHDC(hdc_);
+				delete graphics_;
 			}
-			if(gdiplus_token) Gdiplus::GdiplusShutdown(gdiplus_token);
+			if(gdiplus_token_) Gdiplus::GdiplusShutdown(gdiplus_token_);
 		}
 		st init(HDC hdc)
 		{
+			hdc_ = hdc;
 			Gdiplus::GdiplusStartupInput gdiplus_input;
-			if(Gdiplus::GdiplusStartup(&gdiplus_token, &gdiplus_input, NULL) != Gdiplus::Status::Ok) return FALSE;
+			if(Gdiplus::GdiplusStartup(&gdiplus_token_, &gdiplus_input, NULL) != Gdiplus::Status::Ok) return FALSE;
+			graphics_ = new Gdiplus::Graphics(hdc_);
+			if(graphics_ == NULL) return FALSE;
+			graphics_->SetSmoothingMode(Gdiplus::SmoothingModeHighQuality);
 
-			hdc = hdc;
-
-			graphics = new Gdiplus::Graphics(hdc);
-			if(graphics == NULL) return FALSE;
-			graphics->SetSmoothingMode(Gdiplus::SmoothingModeHighQuality);
-
-			color = new Gdiplus::Color();
-			if(color == NULL)return FALSE;
-			font = new Gdiplus::Font(L"新宋体", 15, Gdiplus::FontStyle::FontStyleRegular);
-			if(font == NULL) return FALSE;
+			Color* c = &_color_;
+			color_ = new Gdiplus::Color((BYTE)(c->alpha * 255), c->red, c->green, c->blue);
+			if(color_ == NULL)return FALSE;
+			font_ = new Gdiplus::Font(L"新宋体", 15, Gdiplus::FontStyle::FontStyleRegular);
+			if(font_ == NULL) return FALSE;
 			return TRUE;
 		}
 	public:

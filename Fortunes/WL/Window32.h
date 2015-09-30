@@ -8,41 +8,31 @@ namespace WL
 	class Window32
 	{
 		_Window32* self;
-	private:
-		Window32(const Window32&) {}//forbidden
-		Window32& operator=(const Window32&) {}//forbidden
 	public:
-		Window32() {}
+		Window32();
 		~Window32();
-		st init();
-	public:
-		st create(const char* class_name, st style, st ex_style);
-		HWND get_handle();
-		void set_ico(st ico_resource_id);//resource id
-		void set_title(const char* title);
-		const char* get_title();
-		void set_parent(HWND parent);
-		HWND get_parent();
-		void set_frame(const Rect* r);
+		st init(const char* class_name = NULL, st style = 0, st ex_style = 0);
+
+		Window32(const Window32&) = delete;
+		Window32& operator=(const Window32&) = delete;
+
+		cl_define_property(Window32, HWND, parent);
+		cl_define_property(Window32, const char*, title);
+		cl_define_property(Window32, const Rect*, frame);
 		void set_frame(ft x, ft y, ft w, ft h);
-		void get_frame(Rect* r);
-		ft get_width();
-		ft get_height();
-		void set_is_layer(st val);
-		st get_is_layer();
-		void set_alpha(ft val);
-		ft get_alpha();
+		cl_define_property(Window32, st, is_layer);
+		cl_define_property(Window32, ft, alpha);
+		cl_define_property(Window32, st, is_show);
+		cl_define_property(Window32, st, ico);//resource id
+		cl_define_property(Window32, st, is_focus);
+		cl_define_property(Window32, void*, dispatcher);
 
+		operator HWND();
 		void update();
-		void show();
-		void hide();
 		void close();
-		void set_focus();
-
-		void set_dispatcher(void* dispatcher);
 	public:
-		static void set_application(HINSTANCE ins);
-		static void loop();
-		static void exit();
+		static HINSTANCE application = NULL;
+		static void loop() { MSG msg; while(GetMessage(&msg, NULL, 0, 0)) { TranslateMessage(&msg); DispatchMessage(&msg); } }
+		static void exit() { PostQuitMessage(0); }
 	};
 }

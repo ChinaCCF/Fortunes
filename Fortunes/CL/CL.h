@@ -86,6 +86,24 @@ typedef f64 ft;
 #define TRUE 1
 #endif
 
+
+/***************************************************************************************/
+//preprocessor
+/***************************************************************************************/
+#define _cl_pre_connect(a, b) a##b
+#define cl_pre_connect(a, b) _cl_pre_connect(a, b)
+
+#define cl_pre_bool_0 0
+#define cl_pre_bool_1 1
+#define cl_pre_to_bool(i) cl_pre_connect(cl_pre_bool_, i)
+
+#define cl_pre_if_0(a, b) b
+#define cl_pre_if_1(a, b) a
+#define cl_pre_if(if, true, false) cl_pre_connect(cl_pre_if_, cl_pre_to_bool(if))(true, false)
+
+#define cl_pre_tuple_2_0(p0, p1) p0
+#define cl_pre_tuple(size, index, tuple) cl_pre_connect(cl_pre_connect(cl_pre_tuple_,size), cl_pre_connect(_, index))tuple
+
 namespace cl
 {
 	template <typename T> inline T MAX(T a, T b) { return a > b ? a : b; }
@@ -98,5 +116,30 @@ namespace cl
 		static void printf(const char* file, st line, const char* message);
 	};
 #define cl_printf(msg) cl::LoggerUtil::printf(__FILE__, __LINE__, msg)
+
+
+	template<typename ClassT, typename T>
+	class Property
+	{
+	public:
+		typedef T(ClassT::*GetT)();
+		typedef void (ClassT::*SetT)(T);
+	private:
+		ClassT* obj = NULL;
+		GetT get = NULL;
+		SetT set = NULL;
+	public:
+		Property() = default;
+		Property(ClassT* o, GetT g, SetT s) :obj(o), get(g), set(s) {}
+		operator T() { if(get) return (obj->*get)();  return T(); }
+		Property& operator = (T val) { (obj->*set)(val); return *this; }
+	};
+#define cl_define_readonly_property(ClassT, Type, Name) virtual Type get_##Name(); cl::Property<ClassT, Type> Name
+#define cl_init_readonly_property(ClassT, Name) Name(this, &ClassT::get_##Name, NULL)
+
+#define cl_define_property(ClassT, Type, Name) virtual Type get_##Name(); virtual void set_##Name(Type); cl::Property<ClassT, Type> Name 
+#define cl_init_property(ClassT, Name) Name(this, &ClassT::get_##Name, &ClassT::set_##Name)
+
+#define cl_property(ClassT, Type, Name) virtual Type get_##Name(){return Type();} virtual void set_##Name(Type){} cl::Property<ClassT, Type> Name
 }
 #endif

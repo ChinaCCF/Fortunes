@@ -3,158 +3,98 @@
 #include <Windows.h>
 #include <gdiplus.h>
 #pragma comment(lib,"gdiplus.lib")
+#include <CL/Object/String.h>
 
 namespace WL
 {
-	class _Font
-	{
-	public:
-		HFONT font;
-		char* name;
-		st size;
-		st is_bold;
-
-		_Font()
-		{
-			font = NULL;
-			name = NULL;
-			size = 15;
-			is_bold = FALSE;
-		}
-	};
+	Font::Font() :cl_init_property(Font, name) {}
 	Font::~Font()
 	{
-		if(self)
-		{
-			cl_free(self->name);
-			if(self->font) DeleteObject(self->font);
-		}
-
-		cl_delete(self);
+		cl_free(name_);
+		if(font_) DeleteObject(font_);
 	}
-
-	st Font::init()
+	st Font::init() { name_ = cl_string_alloc("新宋体"); if(name == NULL) return FALSE; return TRUE; }
+	Font::operator HFONT()
 	{
-		self = cl_new(_Font);
-		if(self == NULL) return FALSE;
-		self->name = cl_string_alloc("新宋体");
-		if(self->name == NULL) return FALSE;
-		return TRUE;
-	}
-
-	void Font::set_size(st val) { self->size = val; }
-	st Font::get_size()const { return self->size; }
-
-	void Font::set_is_bold(st val) { self->is_bold = val; }
-	st Font::get_is_bold()const { return self->is_bold; }
-
-	void Font::set_name(const char* name)
-	{
-		cl_free(self->name);
-		self->name = cl_string_alloc(name);
-	}
-	const char* Font::get_name()const { return self->name; }
-
-	Font* Font::copy()
-	{
-		Font* f = cl_new(Font);
-		if(f)
-		{
-			if(!f->init())
-			{
-				cl_delete(f);
-				return NULL;
-			}
-			f->set_is_bold(self->is_bold);
-			f->set_name(self->name);
-			f->set_size(self->size);
-			return f;
-		}
-		return NULL;
-	}
-
-	Font& Font::operator = (const Font& f)
-	{
-		cl_free(self->name);
-		self->name = cl_string_alloc(f.get_name());
-		self->size = f.get_size();
-		self->is_bold = f.get_is_bold();
-		return *this;
-	}
-
-	void* Font::get_HFONT()
-	{
-		if(self->font) DeleteObject(self->font);
-		self->font = CreateFontA(
-			self->size,						//字体的逻辑高度  
+		if(font_) DeleteObject(font_);
+		font_ = CreateFontA(
+			size,						//字体的逻辑高度  
 			0,					        //宽度  
 			0,							//与水平线的角度  
 			0,							//基线方位角度  
 			FW_REGULAR,					//字形：常规  
 			FALSE,						//字形：斜体  
 			FALSE,						//字形：下划线  
-			self->is_bold,					//字形：粗体  
+			is_bold,					//字形：粗体  
 			GB2312_CHARSET,				//字符集  
 			OUT_DEFAULT_PRECIS,			//输出精度  
 			CLIP_DEFAULT_PRECIS,		//剪截精度  
 			PROOF_QUALITY,				//输出品质  
 			DEFAULT_PITCH | FF_MODERN,	//倾斜度  
-			self->name						//字体  
-			);
-		return self->font;
+			name_); 				    //字体  
+		return font_;
 	}
-
-	class _ImageData
+	void Font::set_name(const char* _name)
 	{
-	public:
-		char* file;
-		Gdiplus::Image* image;
-		_ImageData() { file = NULL; image = NULL; }
-	};
+		cl_free(name_);
+		name_ = cl_string_alloc(_name);
+	}
+	const char* Font::get_name(){ return name_; }
+	/**********************************************************************************************/
+	//#############################################################################################
+	/**********************************************************************************************/
+	ImageData::ImageData() :
+		cl_init_property(ImageData, file),
+		cl_init_readonly_property(ImageData, width),
+		cl_init_readonly_property(ImageData, height),
+		cl_init_readonly_property(ImageData, image)
+	{}
 
 	ImageData::~ImageData()
 	{
-		if(self)
-		{
-			cl_free(self->file);
-			if(self->image) delete self->image;
-		}
-		cl_delete(self);
-	}
-
-	st ImageData::init()
-	{
-		self = cl_new(_ImageData);
-		if(self == NULL) return FALSE;
-		return TRUE;
-	}
-
+		cl_free(file_);
+		if(data_) { Gdiplus::Image* img = (Gdiplus::Image*)data_; delete img; }
+	} 
 	void ImageData::set_file(const char* file)
 	{
-		if(self->image) { delete self->image; self->image = NULL; }
-		cl_free(self->file);
-		self->file = cl_string_alloc(file);
+		cl_free(file_);
+		has_chage_ = TRUE;
+		file_ = cl_string_alloc(file);
 	}
-	const char* ImageData::get_file() { return self->file; }
+	const char* ImageData::get_file() { return file_; }
 
-	st ImageData::get_width() { if(self->image) return self->image->GetWidth(); return 0; }
-	st ImageData::get_height() { if(self->image) return self->image->GetHeight(); return 0; }
+	st ImageData::get_width()
+	{
+		get_image();
+		if(data_) {
+			Gdiplus::Image* img = (Gdiplus::Image*)data_;
+			return img->GetWidth();
+		}
+		return 0;
+	}
+	st ImageData::get_height()
+	{
+		get_image();
+		if(data_)
+		{
+			Gdiplus::Image* img = (Gdiplus::Image*)data_;
+			return img->GetHeight();
+		}
+		return 0;
+	}
 
 	void* ImageData::get_image()
-	{
-		if(self->image)
-			return self->image;
-
-		if(self->file)
+	{  
+		if(has_chage_)
 		{
-			st count = cl::StringUtil::char_to_wchar_count(self->file);
-			wchar* file = cl_alloc_type_with_count(wchar, count);
-			cl::StringUtil::char_to_wchar(file, count, self->file);
-			self->image = new Gdiplus::Image(file);
-			cl_free(file);
-			return self->image;
+			if(file_)
+			{ 
+				wchar* file = cl_alloc_wchars_for_chars(file_);
+				data_ = new Gdiplus::Image(file);
+				cl_free(file); 
+			}
 		}
-		return NULL;
+		return data_;
 	}
 
 }

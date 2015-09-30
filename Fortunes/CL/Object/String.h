@@ -13,10 +13,14 @@ namespace cl
 		static char* alloc(const char*str, const char* file, st line);
 		static char* alloc_from_memory(void* buf, st size, const char* file, st line);
 		static void* memory_alloc_from(const char* file, st line, const char* str, st len = 0);
+		static char* alloc_chars_for_wchars(const wchar* str, const char* file, st line);
+		static wchar* alloc_wchars_for_chars(const char* str, const char* file, st line);
 #else
 		static char* alloc(const char*str);
 		static char* alloc_from_memory(void* buf, st size);
 		static void* memory_alloc_from(const char* str, st len = 0);
+		static char* alloc_chars_for_wchars(const wchar* str);
+		static wchar* alloc_wchars_for_chars(const char* str);
 #endif
 
 		static st length(const char* str);
@@ -31,7 +35,6 @@ namespace cl
 
 		static st char_to_wchar_count(const char* str);
 		static st wchar_to_char_count(const wchar* str);
-
 		static st char_to_wchar(wchar* buf, st buf_count, const char* str);
 		static st wchar_to_char(char* buf, st buf_count, const wchar* str);
 
@@ -66,10 +69,14 @@ namespace cl
 #define cl_string_alloc(x) cl::StringUtil::alloc(x, __FILE__, __LINE__)
 #define cl_string_alloc_from_memory(p, size) cl::StringUtil::alloc_from_memory(p, size, __FILE__, __LINE__)
 #define cl_memory_alloc_from_string(str, ...) cl::StringUtil::memory_alloc_from(__FILE__, __LINE__, str, ##__VA_ARGS__)
+#define cl_alloc_chars_for_wchars(str) cl::StringUtil::alloc_chars_for_wchars(str, __FILE__, __LINE__)
+#define cl_alloc_wchars_for_chars(str) cl::StringUtil::alloc_wchars_for_chars(str, __FILE__, __LINE__)
 #else
 #define cl_string_alloc(x) cl::StringUtil::alloc(x)
 #define cl_string_alloc_from_memory(p, size) cl::StringUtil::alloc_from_memory(p, size)
 #define cl_memory_alloc_from_string(str, ...) cl::StringUtil::memory_alloc_from(str, ##__VA_ARGS__)
+#define cl_alloc_chars_for_wchars(str) cl::StringUtil::alloc_chars_for_wchars(str)
+#define cl_alloc_wchars_for_chars(str) cl::StringUtil::alloc_wchars_for_chars(str)
 #endif
 
 	struct StringInfo

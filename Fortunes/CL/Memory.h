@@ -1,5 +1,6 @@
 #include <CL/CL.h>
 #include <new> 
+#include <math.h>
 
 #ifndef __CL_Memory__
 #define __CL_Memory__
@@ -126,7 +127,7 @@ namespace cl
 		static inline u32 rotate(u32 val, ut n, st is_right = TRUE) { if(is_right) return val >> n | val << (32 - n); return val << n | val >> (32 - n); }
 		static inline u64 rotate(u64 val, ut n, st is_right = TRUE) { if(is_right) return val >> n | val << (64 - n); return val << n | val >> (64 - n); }
 		static inline st is_contain_bits(st flags, st bits) { st val = flags & bits; if(val == bits) return TRUE; return FALSE; }
-		static inline st is_float_equ(ft f1, ft f2, ft offset = 0.001) { ft val = abs(f1 - f2); if(val < offset) return TRUE; return FALSE; }
+		static inline st is_float_equ(ft f1, ft f2, ft offset = 0.0001) { ft val = abs(f1 - f2); if(val < offset) return TRUE; return FALSE; }
 	};
 
 #if CL_IS_DEBUG
@@ -144,28 +145,26 @@ namespace cl
 #define cl_alloc_type(T)                ((T*)cl_alloc(sizeof(T)))
 #define cl_alloc_type_with_count(T, n)  ((T*)cl_alloc(sizeof(T) * n))
 
-	template<typename T>
-	static inline T* _cl_new(T* obj)
-	{
-		if(obj) return new(obj)T;
-		return NULL;
-	}
-#define cl_new(T) cl::_cl_new(cl_alloc_type(T))
+//	template<typename T, typename... Args>
+//	static inline T* _cl_new(T* obj, Args... args)
+//	{
+//		if(obj) return new(obj)T(args...);
+//		return NULL;
+//	}
+//#define cl_new(T, ...) cl::_cl_new(cl_alloc_type(T), ##__VA_ARGS__)
 
-	template<typename T>
-	static inline T* _cl_init(T* obj)
+	template<typename T, typename... Args>
+	static inline T* _cl_init(T* obj, Args... args)
 	{
 		if(obj)
 		{
-			new(obj)T;//for class member
-			if(obj->init()) return obj;
-			delete obj;
-			return NULL;
+			new(obj)T;
+			if(obj->init(args...)) return obj;
+			delete obj;	return NULL;
 		}
 		return NULL;
 	}
-#define cl_new_init(T) cl::_cl_init(cl_alloc_type(T))
-
+#define cl_alloc_init(T, ...) cl::_cl_init(cl_alloc_type(T), ##__VA_ARGS__)
 
 	template<typename T>
 	class Auto
@@ -186,6 +185,7 @@ namespace cl
 		st operator!=(st val) { return operator==(val); }
 		operator st() { return p != NULL; }
 	};
-#define cl_auto_new_init(T) cl::Auto<T>(cl_new_init(T))
+//#define cl_auto_new(T, ...) cl::Auto<T>(cl_new(T, ##__VA_ARGS__))
+#define cl_auto_alloc_init(T, ...) cl::Auto<T>(cl_alloc_init(T, ##__VA_ARGS__))
 }
 #endif
